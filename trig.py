@@ -298,9 +298,9 @@ class Similarity(Scene):
             label.next_to(*location, buff=buff)
 
         def text_label(label, line, location, buff, text):
-                label.become(MathTex(text))
-                label.rotate(line.get_angle())
-                label.next_to(*location, buff=buff)
+            label.become(MathTex(text))
+            label.rotate(line.get_angle())
+            label.next_to(*location, buff=buff)
 
         label_d.add_updater(
             lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3)
@@ -323,17 +323,53 @@ class Similarity(Scene):
             lambda mob: text_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, "Hyp.")
         )
         label_hyp.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
+        label_angle.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
 
+        tri_copy = big_tri.copy()
+        tri_copy.clear_updaters()
         
         self.add(big_tri, line_a, line_b, line_c, angle_a, label_a, angle_c)
         for pos in dots:
-            pos.shift([-3.5, 0, 0])
+            pos.shift([-3.0, 0, 0])
+        tri_copy.shift([-3.0, 0, 0])
+
         self.play(
+            tri_copy.animate.shift([6.0, 0, 0]),
+            FadeOut(angle_a),
+            FadeOut(angle_c),
+            FadeOut(label_a),
+            run_time=0.5
+        )
+        self.wait(0.1)
+        self.play(
+            dots.animate.scale(1.25),
+            tri_copy.animate.scale(0.8)
+        )
+        self.wait()
+        self.play(
+            dots.animate.scale(0.8),
+            tri_copy.animate.scale(1.25)
+        )
+        self.play(
+            tri_copy.animate.shift([-6.5, 0, 0]),
+            dots.animate.shift([-0.5, 0, 0]),
+            # dots[1].animate.shift([0, -0.0068, 0])
+        )
+        label_angle.become(MathTex(r"53^\circ"), color=BLUE)
+        self.remove(tri_copy)
+        self.wait()
+
+        label_a.clear_updaters()
+        self.play(
+            FadeIn(angle_a),
+            FadeIn(angle_c),
+            FadeIn(label_angle),
             Write(label_d),
             Write(label_e),
             Write(label_f)
         )
         self.wait()
+
         self.play(dots.animate.scale(1.25), run_time=2)
         self.play(dots.animate.scale(0.8), run_time=2)
         self.play(dots.animate.scale(0.8), run_time=2)
@@ -347,12 +383,12 @@ class Similarity(Scene):
         label_f.clear_updaters()
         
         self.play(
-            label_d.animate.move_to([1.0, 2.0, 0]),
-            copy_d.animate.move_to([1.0, 1.0, 0]),
+            label_d.animate.move_to([1.0, 2.0, 0]).rotate(PI / 2),
+            copy_d.animate.move_to([1.0, 1.0, 0]).rotate(PI / 2),
             label_e.animate.move_to([2.0, 2.0, 0]),
             copy_e.animate.move_to([2.0, 1.0, 0]),
-            label_f.animate.move_to([3.0, 2.0, 0]),
-            copy_f.animate.move_to([3.0, 1.0, 0]),
+            label_f.animate.move_to([3.0, 2.0, 0]).rotate(-float(line_c.get_angle())),
+            copy_f.animate.move_to([3.0, 1.0, 0]).rotate(-float(line_c.get_angle())),
         )
 
         label_d.add_updater(lambda mob: mob.become(MathTex(f"{line_a.get_length():.2f}")))
@@ -362,5 +398,4 @@ class Similarity(Scene):
         copy_e.add_updater(lambda mob: mob.become(MathTex(f"{line_b.get_length():.2f}")))
         copy_f.add_updater(lambda mob: mob.become(MathTex(f"{line_c.get_length():.2f}")))
 
-        
 
