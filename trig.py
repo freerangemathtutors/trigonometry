@@ -13,43 +13,56 @@ class Intro(Scene):
         get_b = lambda: dots[1].get_center()
         get_c = lambda: dots[2].get_center()
 
-        big_tri = Polygon(get_a(), get_b(), get_c(), color=WHITE, stroke_width=4).set_fill(BLUE, 0.5, False)
+        line_a = Line(get_b(), get_c()).set_opacity(0)
+        line_b = Line(get_a(), get_c()).set_opacity(0)
+        line_c = Line(get_a(), get_b()).set_opacity(0)
+        line_a.add_updater(lambda mob: mob.become(Line(get_b(), get_c())))
+        line_b.add_updater(lambda mob: mob.become(Line(get_a(), get_c())))
+        line_c.add_updater(lambda mob: mob.become(Line(get_a(), get_b())))
+
+        big_tri = Polygon(get_a(), get_b(), get_c(), color=WHITE, stroke_width=4).set_fill(BLUE, 0.3, False)
 
         def update_triangle(mob):
             mob.set_points_as_corners([get_a(), get_b(), get_c(), get_a()])
 
         big_tri.add_updater(update_triangle)
 
-        angle_a = Angle(Line(get_a(), get_c()), Line(get_a(), get_b()), radius=0.7, color=BLUE).set_opacity(0)
-        angle_b = Angle(Line(get_b(), get_a()), Line(get_b(), get_c()), radius=0.7, color=RED).set_opacity(0)
+        angle_a = Angle(line_b, line_c, radius=0.7, color=BLUE).set_opacity(0).set_stroke(BLUE, 0.3)
+        angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED).set_opacity(0)
         angle_c = RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
 
         angle_a.add_updater(lambda mob: mob.become(
-            Angle(Line(get_a(), get_c()), Line(get_a(), get_b()), radius=0.7, color=BLUE)
+            Angle(line_b, line_c, radius=0.7, color=BLUE)
         ))
         angle_b.add_updater(lambda mob: mob.become(
-            Angle(Line(get_b(), get_a()), Line(get_b(), get_c()), radius=0.7, color=RED)
+            Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED)
         ))
         angle_c.add_updater(lambda mob: mob.become(
             RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
         ))
 
-        label_a = MathTex(r"\theta", color=BLUE)
-        label_b = MathTex(r"\phi", color=RED)
+        label_a = MathTex(r"a", color=BLUE).set_opacity(0)
+        label_b = MathTex(r"b", color=RED).set_opacity(0)
         label_c = MathTex(r"90^\circ", color=WHITE)
-        label_d = MathTex(r"Opposite", color=WHITE)
-        label_e = MathTex(r"Adjacent", color=WHITE)
-        label_f = MathTex(r"Hypotenuse", color=WHITE)
-        label_same = MathTex(r"Similar!", color=YELLOW)
+        label_d = Tex(r"Opposite", color=WHITE).set_opacity(0)
+        label_e = Tex(r"Adjacent", color=WHITE).set_opacity(0)
+        label_f = Tex(r"Hypotenuse", color=WHITE)
+        label_same = Tex(r"Similar!", color=YELLOW)
+        label_prop = Tex(r"Proportions!", color=YELLOW)
+        detour_box = Rectangle(WHITE, 6, 10)
+        detour_label = Tex(r"Naming the sides:")
 
         label_a.next_to(angle_a, RIGHT, buff=0.1)
         label_b.next_to(angle_b, DOWN, buff=0.1)
         label_c.next_to(angle_c, UP + LEFT, buff=0.1)
-        label_d.next_to(Line(get_b(), get_c()), RIGHT, buff=0.3)
-        label_e.next_to(Line(get_a(), get_c()), DOWN, buff=0.3)
-        label_f.next_to(Line(get_a(), get_b()), LEFT, buff=0.1)
+        label_d.next_to(line_a, RIGHT, buff=0.3)
+        label_e.next_to(line_b, DOWN, buff=0.3)
+        label_f.next_to(line_c, LEFT, buff=0.1)
         label_f.shift([0.5, 0, 0])
         label_same.shift([0, -3, 0])
+        label_prop.shift([0, -3, 0])
+        detour_box.shift([0, -0.67, 0])
+        detour_label.move_to([0, 3, 0])
 
         label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
         label_b.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
@@ -66,6 +79,7 @@ class Intro(Scene):
         )
         
         copy_group = VGroup(tri_copy, angle_f)
+        self.add(line_a, line_b, line_c)
 
         # Animations begin
         self.play(
@@ -83,7 +97,7 @@ class Intro(Scene):
         self.add(copy_group)
         self.play(
             copy_group.animate.move_to([3.0, 0, 0]),
-            (pos.animate.shift([-3.0, 0, 0]) for pos in dots)
+            dots.animate.shift([-3.0, 0, 0])
         )
         self.wait()
 
@@ -95,32 +109,26 @@ class Intro(Scene):
         # self.wait()
 
         self.play(
-            copy_group.animate.scale(1.6)
+            copy_group.animate.scale(1.6),
+            run_time=2
         )
-        self.wait()
+        self.wait(0.1)
         self.play(
             copy_group.animate.scale(0.625),
-            Write(label_same)
+            Write(label_same),
+            run_time=2
         )
-        self.wait()
+        self.wait(0.1)
 
         self.play(
-            copy_group.animate.scale(0.625)
+            copy_group.animate.scale(0.625),
+            run_time=2
         )
         self.wait()
         # self.play(
         #     copy_group.animate.scale(1.6)
         # )
         # self.wait()
-
-        angle_c.suspend_updating()
-        angle_f.suspend_updating()
-        self.play(
-            Indicate(angle_c),
-            Indicate(angle_f)
-        )
-        angle_c.resume_updating()
-        angle_f.resume_updating()
 
         copy_vertices = tri_copy.get_vertices()
         angle_d = Angle(
@@ -133,8 +141,11 @@ class Intro(Scene):
             Line(copy_vertices[1], copy_vertices[2]), 
             radius=0.4, color=RED
         ).set_opacity(0).set_fill(0)
+        line_d = Line(copy_vertices[2], copy_vertices[1])
+        line_e = Line(copy_vertices[0], copy_vertices[2])
+        line_f = Line(copy_vertices[0], copy_vertices[1])
 
-        self.add(angle_a, angle_b)
+        self.add(angle_a, angle_b, angle_d, angle_e, line_d, line_e, line_f)
         self.play(
             angle_a.animate.set_opacity(1),
             angle_b.animate.set_opacity(1),
@@ -144,35 +155,78 @@ class Intro(Scene):
         )
         angle_a.suspend_updating()
         angle_b.suspend_updating()
+        angle_c.suspend_updating()
         angle_d.suspend_updating()
         angle_e.suspend_updating()
+        angle_f.suspend_updating()
         self.play(
-            Succession(
-                Flash(angle_a),
-                Flash(angle_b),
-                Flash(angle_d),
-                Flash(angle_e),
-                lag_ratio=0.6
-            ),
+            Indicate(angle_a),
+            Indicate(angle_d),
+        )
+        self.play(
+            Indicate(angle_b),
+            Indicate(angle_e),
+        )
+        self.play(
+            Indicate(angle_c),
+            Indicate(angle_f),
         )
         angle_a.resume_updating()
         angle_b.resume_updating()
+        angle_c.resume_updating()
         angle_d.resume_updating()
         angle_e.resume_updating()
+        angle_f.resume_updating()
+
+        line_a.suspend_updating()
+        line_b.suspend_updating()
+        line_c.suspend_updating()
+
+        self.play(TransformMatchingShapes(label_same, label_prop))
+        line_a.set_opacity(1).set_z_index(1.0)
+        line_b.set_opacity(1).set_z_index(1.0)
+        line_c.set_opacity(1).set_z_index(1.0)
+        self.wait()
+        self.play(
+            Indicate(line_b),
+            Indicate(line_e)
+        )
+        self.play(
+            Indicate(line_c),
+            Indicate(line_f)
+        )
+        self.play(
+            Indicate(line_a),
+            Indicate(line_d)
+        )
+        self.wait()
+
+        line_a.resume_updating()
+        line_b.resume_updating()
+        line_c.resume_updating()
+        self.remove(line_d, line_e, line_f)
         
         self.play(
             angle_d.animate.set_opacity(0),
             angle_e.animate.set_opacity(0),
             Uncreate(copy_group),
-            Unwrite(label_same),
-            (pos.animate.shift([3.0, 0, 0]) for pos in dots)
+            Unwrite(label_prop),
+            dots.animate.shift([3.0, 0, 0])
         )
         self.wait()
 
         self.play(
-            Write(label_a),
-            Write(label_b),
-            Write(label_c)
+            Create(detour_box),
+            Write(detour_label)
+        )
+
+        self.play(Write(label_f))
+        self.wait(2)
+
+        self.play(
+            label_a.animate.set_opacity(1),
+            label_b.animate.set_opacity(1),
+            label_c.animate.set_opacity(1),
         )
         self.wait()
 
@@ -192,15 +246,17 @@ class Intro(Scene):
             Indicate(label_a),
             Unwrite(angle_b),
             Unwrite(label_b),
-            run_time=3
+            run_time=2.5
         )
 
-        self.play(
-            Write(label_d),
-            Write(label_e),
-            Write(label_f)
-        )
-        self.wait(2)
+        label_d.set_opacity(1)
+        label_e.set_opacity(1)
+
+        self.play(Write(label_d))
+        self.wait()
+
+        self.play(Write(label_e))
+        self.wait(1.5)
 
         self.play(
             AnimationGroup(
@@ -208,6 +264,8 @@ class Intro(Scene):
                     Unwrite(label_d),
                     Unwrite(label_e),
                     Unwrite(label_f),
+                    Uncreate(detour_box),
+                    Unwrite(detour_label),
                     lag_ratio=0
                 ),
                 AnimationGroup(
@@ -260,16 +318,16 @@ class Similarity(Scene):
             RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
         ))
 
-        label_a = MathTex(r"\theta", color=BLUE)
+        label_a = MathTex(r"a", color=BLUE)
         label_b = MathTex(r"\phi", color=RED)
         label_c = MathTex(r"90^\circ", color=WHITE)
-        label_d = MathTex(r"Opposite", color=WHITE)
-        label_e = MathTex(r"Adjacent", color=WHITE)
-        label_f = MathTex(r"Hypotenuse", color=WHITE)
-        label_opp = MathTex(r"Opp.", color=WHITE)
-        label_adj = MathTex(r"Adj.", color=WHITE)
-        label_hyp = MathTex(r"Hyp.", color=WHITE)
-        label_same = MathTex(r"Similar!", color=YELLOW)
+        label_d = Tex(r"Opposite", color=WHITE)
+        label_e = Tex(r"Adjacent", color=WHITE)
+        label_f = Tex(r"Hypotenuse", color=WHITE)
+        label_opp = Tex(r"Opp.", color=WHITE)
+        label_adj = Tex(r"Adj.", color=WHITE)
+        label_hyp = Tex(r"Hyp.", color=WHITE)
+        label_same = Tex(r"Similar!", color=YELLOW)
         label_angle = MathTex(r"0^\circ", color=BLUE)
 
         label_a.next_to(angle_a, RIGHT, buff=0.1)
@@ -355,7 +413,7 @@ class Similarity(Scene):
             dots.animate.shift([-0.5, 0, 0]),
             # dots[1].animate.shift([0, -0.0068, 0])
         )
-        label_angle.become(MathTex(r"53^\circ"), color=BLUE)
+        label_angle.become(MathTex(r"53^\circ", color=BLUE))
         self.remove(tri_copy)
         self.wait()
 
