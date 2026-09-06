@@ -16,9 +16,9 @@ class Intro(Scene):
         line_a = Line(get_b(), get_c()).set_opacity(0)
         line_b = Line(get_a(), get_c()).set_opacity(0)
         line_c = Line(get_a(), get_b()).set_opacity(0)
-        line_a.add_updater(lambda mob: mob.become(Line(get_b(), get_c())))
-        line_b.add_updater(lambda mob: mob.become(Line(get_a(), get_c())))
-        line_c.add_updater(lambda mob: mob.become(Line(get_a(), get_b())))
+        line_a.add_updater(lambda mob: mob.put_start_and_end_on(get_b(), get_c()))
+        line_b.add_updater(lambda mob: mob.put_start_and_end_on(get_a(), get_c()))
+        line_c.add_updater(lambda mob: mob.put_start_and_end_on(get_a(), get_b()))
 
         big_tri = Polygon(get_a(), get_b(), get_c(), color=WHITE, stroke_width=4).set_fill(BLUE, 0.3, False)
 
@@ -49,7 +49,7 @@ class Intro(Scene):
         label_f = Tex(r"Hypotenuse", color=WHITE)
         label_same = Tex(r"Similar!", color=YELLOW)
         label_prop = Tex(r"Proportions!", color=YELLOW)
-        detour_box = Rectangle(WHITE, 6, 10)
+        detour_box = Rectangle(WHITE, 6, 9.6)
         detour_label = Tex(r"Naming the sides:")
 
         label_a.next_to(angle_a, RIGHT, buff=0.1)
@@ -61,7 +61,7 @@ class Intro(Scene):
         label_f.shift([0.5, 0, 0])
         label_same.shift([0, -3, 0])
         label_prop.shift([0, -3, 0])
-        detour_box.shift([0, -0.67, 0])
+        detour_box.shift([0, -0.42, 0])
         detour_label.move_to([0, 3, 0])
 
         label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
@@ -248,6 +248,7 @@ class Intro(Scene):
             Unwrite(label_b),
             run_time=2.5
         )
+        self.play(Transform(label_a, MathTex(r"\theta", color=BLUE).move_to(label_a)))
 
         label_d.set_opacity(1)
         label_e.set_opacity(1)
@@ -278,7 +279,7 @@ class Intro(Scene):
         self.wait()
 
 
-class Similarity(Scene):
+class Proportions(Scene):
     def construct(self):
         # Setup geometry
         dots = VGroup(
@@ -293,15 +294,14 @@ class Similarity(Scene):
         line_a = Line(get_b(), get_c())
         line_b = Line(get_a(), get_c())
         line_c = Line(get_a(), get_b())
-        line_a.add_updater(lambda mob: mob.become(Line(get_b(), get_c())))
-        line_b.add_updater(lambda mob: mob.become(Line(get_a(), get_c())))
-        line_c.add_updater(lambda mob: mob.become(Line(get_a(), get_b())))
+        line_a.add_updater(lambda mob: mob.put_start_and_end_on(get_b(), get_c()))
+        line_b.add_updater(lambda mob: mob.put_start_and_end_on(get_a(), get_c()))
+        line_c.add_updater(lambda mob: mob.put_start_and_end_on(get_a(), get_b()))
 
         big_tri = Polygon(get_a(), get_b(), get_c(), color=WHITE, stroke_width=4)
 
         def update_triangle(mob):
             mob.set_points_as_corners([get_a(), get_b(), get_c(), get_a()])
-
         big_tri.add_updater(update_triangle)
 
         angle_a = Angle(line_b, line_c, radius=0.7, color=BLUE).set_opacity(0)
