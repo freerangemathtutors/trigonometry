@@ -41,16 +41,19 @@ class Intro(Scene):
             RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
         ))
 
-        label_a = MathTex(r"a", color=BLUE).set_opacity(0)
-        label_b = MathTex(r"b", color=RED).set_opacity(0)
-        label_c = MathTex(r"90^\circ", color=WHITE)
-        label_d = Tex(r"Opposite", color=WHITE).set_opacity(0)
-        label_e = Tex(r"Adjacent", color=WHITE).set_opacity(0)
-        label_f = Tex(r"Hypotenuse", color=WHITE)
-        label_same = Tex(r"Similar!", color=YELLOW)
-        label_prop = Tex(r"Proportions!", color=YELLOW)
-        detour_box = Rectangle(WHITE, 6, 9.6)
-        detour_label = Tex(r"Naming the sides:")
+
+        with register_font("Teachers-Medium.ttf"):
+            Text.set_default(font="Teachers")
+            label_a = MathTex(r"a", color=BLUE).set_opacity(0)
+            label_b = MathTex(r"b", color=RED).set_opacity(0)
+            label_c = MathTex(r"90^\circ", color=WHITE)
+            label_d = Tex(r"Opposite", color=WHITE).set_opacity(0)
+            label_e = Tex(r"Adjacent", color=WHITE).set_opacity(0)
+            label_f = Tex(r"Hypotenuse", color=WHITE)
+            label_same = Text("Similar", color=YELLOW)
+            label_prop = Text("Proportions", color=YELLOW)
+            detour_box = Rectangle(WHITE, 5.5, 9.6)
+            detour_label = Text("Naming the sides")
 
         label_a.next_to(angle_a, RIGHT, buff=0.1)
         label_b.next_to(angle_b, DOWN, buff=0.1)
@@ -61,7 +64,7 @@ class Intro(Scene):
         label_f.shift([0.5, 0, 0])
         label_same.shift([0, -3, 0])
         label_prop.shift([0, -3, 0])
-        detour_box.shift([0, -0.42, 0])
+        detour_box.shift([0, -0.2, 0])
         detour_label.move_to([0, 3, 0])
 
         label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
@@ -147,10 +150,10 @@ class Intro(Scene):
 
         self.add(angle_a, angle_b, angle_d, angle_e, line_d, line_e, line_f)
         self.play(
-            angle_a.animate.set_opacity(1),
-            angle_b.animate.set_opacity(1),
-            angle_d.animate.set_opacity(1),
-            angle_e.animate.set_opacity(1),
+            angle_a.animate.set_opacity(1).set_fill(0),
+            angle_b.animate.set_opacity(1).set_fill(0),
+            angle_d.animate.set_opacity(1).set_fill(0),
+            angle_e.animate.set_opacity(1).set_fill(0),
             run_time = 0.5
         )
         angle_a.suspend_updating()
@@ -182,7 +185,7 @@ class Intro(Scene):
         line_b.suspend_updating()
         line_c.suspend_updating()
 
-        self.play(TransformMatchingShapes(label_same, label_prop))
+        self.play(Transform(label_same, label_prop))
         line_a.set_opacity(1).set_z_index(1.0)
         line_b.set_opacity(1).set_z_index(1.0)
         line_c.set_opacity(1).set_z_index(1.0)
@@ -210,7 +213,7 @@ class Intro(Scene):
             angle_d.animate.set_opacity(0),
             angle_e.animate.set_opacity(0),
             Uncreate(copy_group),
-            Unwrite(label_prop),
+            Unwrite(label_same),
             dots.animate.shift([3.0, 0, 0])
         )
         self.wait()
@@ -249,6 +252,7 @@ class Intro(Scene):
             run_time=2.5
         )
         self.play(Transform(label_a, MathTex(r"\theta", color=BLUE).move_to(label_a)))
+        self.play(Indicate(label_a))
 
         label_d.set_opacity(1)
         label_e.set_opacity(1)
@@ -280,6 +284,132 @@ class Intro(Scene):
 
 
 class Proportions(Scene):
+    def construct(self):
+        # Setup geometry
+        dots = VGroup(
+            Dot([-1.5, -2.0, 0]).set_opacity(0),
+            Dot([1.5, 2.0, 0]).set_opacity(0),
+            Dot([1.5, -2.0, 0]).set_opacity(0)
+        )
+        get_a = lambda: dots[0].get_center()
+        get_b = lambda: dots[1].get_center()
+        get_c = lambda: dots[2].get_center()
+
+        line_a = Line(get_b(), get_c())
+        line_b = Line(get_a(), get_c())
+        line_c = Line(get_a(), get_b())
+        line_a.add_updater(lambda mob: mob.put_start_and_end_on(get_b(), get_c()))
+        line_b.add_updater(lambda mob: mob.put_start_and_end_on(get_a(), get_c()))
+        line_c.add_updater(lambda mob: mob.put_start_and_end_on(get_a(), get_b()))
+
+        big_tri = Polygon(get_a(), get_b(), get_c(), color=WHITE, stroke_width=4).set_fill(BLUE, 0.3, False)
+
+        def update_triangle(mob):
+            mob.set_points_as_corners([get_a(), get_b(), get_c(), get_a()])
+        big_tri.add_updater(update_triangle)
+
+        angle_a = Angle(line_b, line_c, radius=0.7, color=BLUE)
+        angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED).set_opacity(0)
+        angle_c = RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
+
+        angle_a.add_updater(lambda mob: mob.become(
+            Angle(line_b, line_c, radius=0.7, color=BLUE)
+        ))
+        angle_b.add_updater(lambda mob: mob.become(
+            Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED)
+        ))
+        angle_c.add_updater(lambda mob: mob.become(
+            RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
+        ))
+
+        # ":" cannot be used in Text()
+        with register_font("Teachers-Medium.ttf"):
+            Text.set_default(font="Teachers")
+            label_a = MathTex(r"\theta", color=BLUE)
+            label_b = MathTex(r"\phi", color=RED)
+            label_c = MathTex(r"90^\circ", color=WHITE)
+            label_d = Tex(r"Opposite", color=WHITE)
+            label_e = Tex(r"Adjacent", color=WHITE)
+            label_f = Tex(r"Hypotenuse", color=WHITE)
+            label_opp = Tex(r"Opp.", color=WHITE)
+            label_adj = Tex(r"Adj.", color=WHITE)
+            label_hyp = Tex(r"Hyp.", color=WHITE)
+            label_sub = Tex(r"Similar!", color=YELLOW)
+            label_angle = MathTex(r"0^\circ", color=BLUE)
+            tex_ratio = Tex(r"4 : 3", color=BLUE)
+            tex_frac = MathTex(r"\frac{4}{3}", color=BLUE)
+            box = Rectangle(WHITE, 6, 7)
+            title = Text("Proportions")
+
+        label_a.next_to(angle_a, RIGHT, buff=0.1)
+        label_b.next_to(angle_b, DOWN, buff=0.1)
+        label_c.next_to(angle_c, UP + LEFT, buff=0.1)
+        label_d.next_to(line_a, RIGHT, buff=0.3)
+        label_e.next_to(line_b, DOWN, buff=0.3)
+        label_f.next_to(line_c, [0, 0, 0], buff=0.1)
+        label_opp.next_to(line_a, RIGHT, buff=0.3)
+        label_adj.next_to(line_b, DOWN, buff=0.3)
+        label_hyp.next_to(line_c, [0, 0, 0], buff=0.1)
+        label_angle.next_to(angle_a, RIGHT, buff=0.1)
+        label_f.shift([0.5, 0, 0])
+        label_sub.shift([0, -3, 0])
+        tex_ratio.move_to([1, 0, 0])
+        tex_frac.move_to([4, 0, 0])
+        box.shift([3, -0.42, 0])
+        title.move_to([2, 3, 0])
+
+        label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
+        label_b.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
+        label_c.add_updater(lambda mob: mob.next_to(angle_c, UP + LEFT, buff=0.1))
+        label_opp.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
+        label_adj.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
+        label_hyp.add_updater(lambda mob: mob.next_to(angle_c, UP + LEFT, buff=0.1))
+
+        def length_label(label, line, location, buff):
+            label.become(MathTex(f"{line.get_length():.2f}"))
+            label.rotate(line.get_angle())
+            label.next_to(*location, buff=buff)
+
+        def text_label(label, line, location, buff, text):
+            label.become(MathTex(text))
+            label.rotate(line.get_angle())
+            label.next_to(*location, buff=buff)
+
+        label_d.add_updater(
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3)
+        )
+        label_e.add_updater(
+            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3)
+        )
+        label_f.add_updater(
+            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3)
+        )
+        label_f.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
+
+        label_opp.add_updater(
+            lambda mob: text_label(mob, line_a, (line_a, RIGHT), 0.3, "Opp.")
+        )
+        label_adj.add_updater(
+            lambda mob: text_label(mob, line_b, (line_b, DOWN), 0.3, "Adj.")
+        )
+        label_hyp.add_updater(
+            lambda mob: text_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, "Hyp.")
+        )
+        label_hyp.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
+        label_angle.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
+        
+        self.add(dots, big_tri, line_a, line_b, line_c, angle_a, label_a, angle_c)
+        dots.shift([-3.0, 0, 0])
+        self.update_mobjects(0)
+        self.wait()
+
+        self.play(
+            Create(box),
+            Write(title)
+        )
+
+
+class Similarity(Scene):
     def construct(self):
         # Setup geometry
         dots = VGroup(
