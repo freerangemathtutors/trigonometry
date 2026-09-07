@@ -1,4 +1,5 @@
 from manim import *
+import math
 import copy
 
 class Intro(Scene):
@@ -274,7 +275,7 @@ class Intro(Scene):
                     lag_ratio=0
                 ),
                 AnimationGroup(
-                    *(pos.animate.shift([-3.5, 0, 0]) for pos in dots), 
+                    *(pos.animate.shift([-4.5, 0, 0]) for pos in dots), 
                     lag_ratio=0
                 ),
                 lag_ratio=0.5
@@ -328,18 +329,48 @@ class Proportions(Scene):
             label_a = MathTex(r"\theta", color=BLUE)
             label_b = MathTex(r"\phi", color=RED)
             label_c = MathTex(r"90^\circ", color=WHITE)
-            label_d = Tex(r"Opposite", color=WHITE)
-            label_e = Tex(r"Adjacent", color=WHITE)
-            label_f = Tex(r"Hypotenuse", color=WHITE)
+            label_d = Tex(r"Opposite", color=ORANGE)
+            label_e = Tex(r"Adjacent", color=RED)
+            label_f = Tex(r"Hypotenuse", color=GREEN)
             label_opp = Tex(r"Opp.", color=WHITE)
             label_adj = Tex(r"Adj.", color=WHITE)
             label_hyp = Tex(r"Hyp.", color=WHITE)
             label_sub = Tex(r"Similar!", color=YELLOW)
-            label_angle = MathTex(r"0^\circ", color=BLUE)
-            tex_ratio = Tex(r"4 : 3", color=BLUE)
-            tex_frac = MathTex(r"\frac{4}{3}", color=BLUE)
-            box = Rectangle(WHITE, 6, 7)
+            label_angle = MathTex(r"53.1^\circ", color=BLUE)
+            tex_ratio = Tex(r"4 : 3", color=WHITE)
+            tex_frac = MathTex(r"\frac{4}{3}", color=WHITE)
+            box = Rectangle(WHITE, 3, 6)
             title = Text("Proportions")
+            sine_ratio = MathTex(
+                r"\frac{Opp.}{Hyp.}=", 
+                tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                font_size=50
+            )
+            cosine_ratio = MathTex(
+                r"\frac{Adj.}{Hyp.}=", 
+                tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                font_size=50
+            )
+            tangent_ratio = MathTex(
+                r"\frac{Opp.}{Adj.}=", 
+                tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                font_size=50
+            )
+            sine_frac = MathTex(
+                r"\frac{0.00}{0.00}=",
+                tex_to_color_map={"0.00": BLACK},
+                font_size=50
+            )
+            cosine_frac = MathTex(
+                r"\frac{0.00}{0.00}=",
+                tex_to_color_map={"0.00": BLACK},
+                font_size=50
+            )
+            tangent_frac = MathTex(
+                r"\frac{0.00}{0.00}=",
+                tex_to_color_map={"0.00": BLACK},
+                font_size=50
+            )
 
         label_a.next_to(angle_a, RIGHT, buff=0.1)
         label_b.next_to(angle_b, DOWN, buff=0.1)
@@ -353,10 +384,16 @@ class Proportions(Scene):
         label_angle.next_to(angle_a, RIGHT, buff=0.1)
         label_f.shift([0.5, 0, 0])
         label_sub.shift([0, -3, 0])
-        tex_ratio.move_to([1, 0, 0])
-        tex_frac.move_to([4, 0, 0])
-        box.shift([3, -0.42, 0])
-        title.move_to([2, 3, 0])
+        box.shift([2, -0.5, 0])
+        title.move_to([2, 2, 0])
+        tex_ratio.next_to(box, LEFT, -2.5)
+        tex_frac.next_to(box, RIGHT, -1.9)
+        sine_ratio.move_to([1, 2, 0])
+        cosine_ratio.move_to([1, 0, 0])
+        tangent_ratio.move_to([1, -2, 0])
+        sine_frac.move_to([3, 2.05, 0])
+        cosine_frac.move_to([3, 0.05, 0])
+        tangent_frac.move_to([3, -1.95, 0])
 
         label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
         label_b.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
@@ -365,24 +402,24 @@ class Proportions(Scene):
         label_adj.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
         label_hyp.add_updater(lambda mob: mob.next_to(angle_c, UP + LEFT, buff=0.1))
 
-        def length_label(label, line, location, buff):
-            label.become(MathTex(f"{line.get_length():.2f}"))
+        def length_label(label, line, location, buff, colour=WHITE):
+            label.become(Tex(f"{line.get_length():.2f}", color=colour))
             label.rotate(line.get_angle())
             label.next_to(*location, buff=buff)
 
-        def text_label(label, line, location, buff, text):
-            label.become(MathTex(text))
+        def text_label(label, line, location, buff, text, colour=WHITE):
+            label.become(Tex(text, color=colour))
             label.rotate(line.get_angle())
             label.next_to(*location, buff=buff)
 
         label_d.add_updater(
-            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3)
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE)
         )
         label_e.add_updater(
-            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3)
+            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, RED)
         )
         label_f.add_updater(
-            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3)
+            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GREEN)
         )
         label_f.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
 
@@ -399,7 +436,7 @@ class Proportions(Scene):
         label_angle.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
         
         self.add(dots, big_tri, line_a, line_b, line_c, angle_a, label_a, angle_c)
-        dots.shift([-3.0, 0, 0])
+        dots.shift([-4, 0, 0])
         self.update_mobjects(0)
         self.wait()
 
@@ -407,6 +444,77 @@ class Proportions(Scene):
             Create(box),
             Write(title)
         )
+        self.wait()
+        self.play(
+            Succession(
+                GrowFromCenter(tex_ratio),
+                GrowFromCenter(tex_frac)
+            )
+        )
+        self.wait(0.5)
+        self.play(
+            Succession(
+                Circumscribe(tex_ratio),
+                Circumscribe(tex_frac)
+            )
+        )
+        self.wait()
+        self.play(
+            Uncreate(box),
+            Unwrite(title),
+            Unwrite(tex_frac),
+            Unwrite(tex_ratio)
+        )
+        self.play(
+            dots[1].animate.move_to([
+                get_c()[0], 
+                get_c()[1] + 5 * math.sin(53.1/360*2*math.pi), 
+                0
+            ]),
+            Transform(label_a, label_angle.move_to(label_a))
+        )
+        tex_frac.become(
+            MathTex(r"\frac{side}{side}", color=WHITE, font_size=69).move_to([3, 0, 0])
+        )
+        self.play(
+            Succession(
+                Write(label_d),
+                Write(label_e),
+                Write(label_f),
+            ),
+            run_time=1.5
+        )
+        self.wait(0.5)
+        self.play(Write(tex_frac))
+        self.wait()
+        self.play(
+            Succession(
+                tex_frac.animate.shift([1, 0, 0]),
+                Write(sine_ratio),
+                Write(cosine_ratio),
+                Write(tangent_ratio),
+                Unwrite(tex_frac)
+            )
+        )
+        self.wait()
+
+        copy_d = label_d.copy().clear_updaters()
+        copy_e = label_e.copy().clear_updaters()
+        copy_f = label_f.copy().clear_updaters()
+        label_d.clear_updaters()
+        label_e.clear_updaters()
+        label_f.clear_updaters()
+        self.add(copy_d, copy_e, copy_f)
+
+        self.play(
+            Write(sine_frac),
+            label_d.animate.move_to(sine_frac.get_center()+[-0.3, 0.4, 0]).rotate(PI/2),
+            copy_f.animate.move_to(sine_frac.get_center()+[-0.3, -0.5, 0]).rotate(-float(line_c.get_angle())),
+            
+            # Write(cosine_frac),
+            # Write(tangent_frac)
+        )
+
 
 
 class Similarity(Scene):
