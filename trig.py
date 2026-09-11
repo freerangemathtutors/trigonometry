@@ -2,6 +2,8 @@ from manim import *
 import math
 import copy
 
+config.renderer = "opengl"
+
 class Intro(Scene):
     def construct(self):
         # Setup geometry
@@ -360,18 +362,20 @@ class Proportions(Scene):
                 r"\frac{0.00}{0.00}=",
                 tex_to_color_map={"0.00": BLACK},
                 font_size=50
-            ).set_z_index(-1)
+            ) # .set_z_index(-1)
             cosine_frac = MathTex(
                 r"\frac{0.00}{0.00}=",
                 tex_to_color_map={"0.00": BLACK},
                 font_size=50
-            ).set_z_index(-1)
+            ) # .set_z_index(-1)
             tangent_frac = MathTex(
                 r"\frac{0.00}{0.00}=",
                 tex_to_color_map={"0.00": BLACK},
                 font_size=50
-            ).set_z_index(-1)
-            sine_result = MathTex()
+            ) # .set_z_index(-1)
+            sine_result = MathTex(r"0.8", color=BLUE_A)
+            cosine_result = MathTex(r"0.6", color=BLUE_B)
+            tangent_result = MathTex(r"1.\overline{3}", color=BLUE_C)
 
         label_a.next_to(angle_a, RIGHT, buff=0.1)
         label_b.next_to(angle_b, DOWN, buff=0.1)
@@ -392,9 +396,12 @@ class Proportions(Scene):
         sine_ratio.move_to([1, 2, 0])
         cosine_ratio.move_to([1, 0, 0])
         tangent_ratio.move_to([1, -2, 0])
-        sine_frac.move_to([3, 2.05, 0])
-        cosine_frac.move_to([3, 0.05, 0])
-        tangent_frac.move_to([3, -1.95, 0])
+        sine_frac.move_to([3, 2.05, -1])
+        cosine_frac.move_to([3, 0.05, -1])
+        tangent_frac.move_to([3, -1.95, -1])
+        sine_result.move_to([4, 2, 0])
+        cosine_result.move_to([4, 0, 0])
+        tangent_result.move_to([4, -1.5, 0])
 
         label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
         label_b.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
@@ -408,12 +415,16 @@ class Proportions(Scene):
             if not static:
                 label.rotate(line.get_angle())
                 label.next_to(*location, buff=buff)
+            else:
+                label.move_to(label.get_center())
 
         def text_label(label, line, location, buff, text, colour=WHITE, static=False):
             label.become(Tex(text, color=colour))
             if not static:
                 label.rotate(line.get_angle())
                 label.next_to(*location, buff=buff)
+            else:
+                label.move_to(label.get_center())
 
         label_d.add_updater(
             lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE)
@@ -514,19 +525,56 @@ class Proportions(Scene):
             copy_d.animate.move_to(sine_frac.get_center()+[-0.3, 0.35, 0]).rotate(PI/2),
             copy_f.animate.move_to(sine_frac.get_center()+[-0.3, -0.4, 0]).rotate(-float(line_c.get_angle())),
         )
-        # self.play(Write(ans))
+        self.play(Write(sine_result))
+        self.wait()
         self.play(
             Write(cosine_frac),
             copy_e.animate.move_to(cosine_frac.get_center()+[-0.3, 0.35, 0]),
             kopi_f.animate.move_to(cosine_frac.get_center()+[-0.3, -0.4, 0]).rotate(-float(line_c.get_angle())),
         )
+        self.play(Write(cosine_result))
+        self.wait()
         self.play(
             Write(tangent_frac),
             kopi_d.animate.move_to(tangent_frac.get_center()+[-0.3, 0.35, 0]).rotate(PI/2),
             kopi_e.animate.move_to(tangent_frac.get_center()+[-0.3, -0.4, 0]),
         )
+        self.play(Write(tangent_result))
         self.wait()
 
+        copy_d.add_updater(
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE, True)
+        )
+        kopi_d.add_updater(
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE, True)
+        )
+        copy_e.add_updater(
+            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, RED, True)
+        )
+        kopi_e.add_updater(
+            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, RED, True)
+        )
+        copy_f.add_updater(
+            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GREEN, True)
+        )
+        kopi_f.add_updater(
+            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GREEN, True)
+        )
+
+        self.play(
+            dots.animate.scale(1.25)
+        )
+        self.wait()
+        self.play(
+            dots.animate.scale(0.8)
+        )
+        self.wait()
+        self.play(
+            Indicate(sine_result),
+            Indicate(cosine_result),
+            Indicate(tangent_result)
+        )
+        self.wait()
 
 
 # class Similarity(Scene):
