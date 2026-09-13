@@ -2,7 +2,7 @@ from manim import *
 import math
 import copy
 
-config.renderer = "opengl"
+# config.renderer = "opengl"
 
 class Intro(Scene):
     def construct(self):
@@ -362,17 +362,17 @@ class Proportions(Scene):
                 r"\frac{0.00}{0.00}=",
                 tex_to_color_map={"0.00": BLACK},
                 font_size=50
-            ) # .set_z_index(-1)
+            ).set_z_index(-1)
             cosine_frac = MathTex(
                 r"\frac{0.00}{0.00}=",
                 tex_to_color_map={"0.00": BLACK},
                 font_size=50
-            ) # .set_z_index(-1)
+            ).set_z_index(-1)
             tangent_frac = MathTex(
                 r"\frac{0.00}{0.00}=",
                 tex_to_color_map={"0.00": BLACK},
                 font_size=50
-            ) # .set_z_index(-1)
+            ).set_z_index(-1)
             sine_result = MathTex(r"0.8", color=BLUE_A)
             cosine_result = MathTex(r"0.6", color=BLUE_B)
             tangent_result = MathTex(r"1.\overline{3}", color=BLUE_C)
@@ -396,12 +396,12 @@ class Proportions(Scene):
         sine_ratio.move_to([1, 2, 0])
         cosine_ratio.move_to([1, 0, 0])
         tangent_ratio.move_to([1, -2, 0])
-        sine_frac.move_to([3, 2.05, -1])
-        cosine_frac.move_to([3, 0.05, -1])
-        tangent_frac.move_to([3, -1.95, -1])
-        sine_result.move_to([4, 2, 0])
-        cosine_result.move_to([4, 0, 0])
-        tangent_result.move_to([4, -1.5, 0])
+        sine_frac.move_to([3, 2.05, 0])
+        cosine_frac.move_to([3, 0.05, 0])
+        tangent_frac.move_to([3, -1.95, 0])
+        sine_result.move_to([4.35, 2, 0])
+        cosine_result.move_to([4.35, 0, 0])
+        tangent_result.move_to([4.35, -1.95, 0])
 
         label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
         label_b.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
@@ -416,7 +416,7 @@ class Proportions(Scene):
                 label.rotate(line.get_angle())
                 label.next_to(*location, buff=buff)
             else:
-                label.move_to(label.get_center())
+                label.move_to(location)
 
         def text_label(label, line, location, buff, text, colour=WHITE, static=False):
             label.become(Tex(text, color=colour))
@@ -425,6 +425,12 @@ class Proportions(Scene):
                 label.next_to(*location, buff=buff)
             else:
                 label.move_to(label.get_center())
+
+        def current_angle():
+            return angle_between_vectors(
+                line_b.get_vector(),
+                line_c.get_vector()
+            )
 
         label_d.add_updater(
             lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE)
@@ -543,30 +549,32 @@ class Proportions(Scene):
         self.wait()
 
         copy_d.add_updater(
-            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE, True)
+            lambda mob: length_label(mob, line_a, (sine_frac.get_center()+[-0.3, 0.35, 0]), 0, ORANGE, True)
         )
         kopi_d.add_updater(
-            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE, True)
+            lambda mob: length_label(mob, line_a, (tangent_frac.get_center()+[-0.3, 0.35, 0]), 0, ORANGE, True)
         )
         copy_e.add_updater(
-            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, RED, True)
+            lambda mob: length_label(mob, line_b, (cosine_frac.get_center()+[-0.3, 0.35, 0]), 0, RED, True)
         )
         kopi_e.add_updater(
-            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, RED, True)
+            lambda mob: length_label(mob, line_b, (tangent_frac.get_center()+[-0.3, -0.4, 0]), 0, RED, True)
         )
         copy_f.add_updater(
-            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GREEN, True)
+            lambda mob: length_label(mob, line_c, (sine_frac.get_center()+[-0.3, -0.4, 0]), 0, GREEN, True)
         )
         kopi_f.add_updater(
-            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GREEN, True)
+            lambda mob: length_label(mob, line_c, (cosine_frac.get_center()+[-0.3, -0.4, 0]), 0, GREEN, True)
         )
 
         self.play(
-            dots.animate.scale(1.25)
+            dots.animate.scale(1.6),
+            run_time=2
         )
         self.wait()
         self.play(
-            dots.animate.scale(0.8)
+            dots.animate.scale(0.625),
+            run_time=2
         )
         self.wait()
         self.play(
@@ -575,6 +583,133 @@ class Proportions(Scene):
             Indicate(tangent_result)
         )
         self.wait()
+
+        label_a.add_updater(lambda mob: mob.become(
+            MathTex(
+                rf"{current_angle() / DEGREES:.2f}^\circ",
+                color=BLUE
+            ).next_to(angle_a, RIGHT, buff=0.1)
+        ))
+        sine_result.add_updater(lambda mob: mob.become(
+            MathTex(
+                rf"{math.sin(current_angle()):.2f}\ldots",
+                color=BLUE_A
+            ).move_to([4.65, 2, 0])
+        ))
+        cosine_result.add_updater(lambda mob: mob.become(
+            MathTex(
+                rf"{math.cos(current_angle()):.2f}\ldots",
+                color=BLUE_B
+            ).move_to([4.65, 0, 0])
+        ))
+        tangent_result.add_updater(lambda mob: mob.become(
+            MathTex(
+                rf"{math.tan(current_angle()):.2f}\ldots",
+                color=BLUE_C
+            ).move_to([4.65, -2, 0])
+        ))
+        results = Group(sine_result, cosine_result, tangent_result)
+
+        self.update_mobjects(0)
+        print("1:" + str(angle_a.get_value(degrees=True)))
+        self.play(
+            dots[1].animate.move_to([
+                get_c()[0], 
+                get_c()[1] + 3 * math.tan(45/360*2*math.pi), 
+                0
+            ]),
+            run_time=0.5
+        )
+        print("2:" + str(angle_a.get_value(degrees=True)))
+        self.play(Indicate(label_a)),
+
+        self.play(
+            dots.animate.scale(1.6),
+            run_time=1.5
+        )
+        results.suspend_updating()
+        self.play(Indicate(results))
+        results.resume_updating()
+        self.play(
+            dots.animate.scale(0.5),
+            run_time=1.5
+        )
+        results.suspend_updating()
+        self.play(Indicate(results))
+        results.resume_updating()
+        self.wait()
+
+        self.play(
+            dots[1].animate.move_to([
+                get_c()[0], 
+                get_c()[1] + line_b.get_length() * math.tan(67/360*2*math.pi), 
+                0
+            ]),
+            run_time=0.5
+        )
+        results.suspend_updating()
+        self.play(Indicate(results))
+        results.resume_updating()
+        self.play(
+            dots.animate.scale(1.6),
+            run_time=1
+        )
+        results.suspend_updating()
+        self.play(Indicate(results))
+        results.resume_updating()
+        self.play(
+            dots.animate.scale(0.7),
+            run_time=1
+        )
+        self.wait()
+
+        self.play(
+            dots[1].animate.move_to([
+                get_c()[0], 
+                get_c()[1] + line_b.get_length() * math.tan(36/360*2*math.pi), 
+                0
+            ]),
+            run_time=0.5
+        )
+        results.suspend_updating()
+        self.play(Indicate(results))
+        results.resume_updating()
+        self.play(
+            dots.animate.scale(1.6),
+            run_time=1
+        )
+        results.suspend_updating()
+        self.play(Indicate(results))
+        results.resume_updating()
+        self.play(
+            dots.animate.scale(0.7),
+            run_time=1
+        )
+
+        results.suspend_updating()
+        self.play(Indicate(results))
+        angle_a.suspend_updating()
+        label_a.suspend_updating()
+        self.play(
+            Indicate(angle_a),
+            Indicate(label_a)
+        )
+
+        new_theta = MathTex(r"\theta", color=BLUE).next_to(angle_a, RIGHT, buff=0.1)
+        self.play(
+            FadeOut(label_a),
+            FadeIn(new_theta)
+        )
+
+        self.play(
+            Transform(sine_ratio, MathTex(r"\sin \theta =").move_to(sine_ratio))
+        )
+        self.play(
+            Transform(cosine_ratio, MathTex(r"\cos \theta =").move_to(cosine_ratio))
+        )
+        self.play(
+            Transform(tangent_ratio, MathTex(r"\tan \theta= ").move_to(tangent_ratio))
+        )
 
 
 # class Similarity(Scene):
