@@ -586,7 +586,7 @@ class Proportions(Scene):
 
         label_a.add_updater(lambda mob: mob.become(
             MathTex(
-                rf"{current_angle() / DEGREES:.2f}^\circ",
+                rf"{current_angle() / DEGREES:.1f}^\circ",
                 color=BLUE
             ).next_to(angle_a, RIGHT, buff=0.1)
         ))
@@ -611,7 +611,6 @@ class Proportions(Scene):
         results = Group(sine_result, cosine_result, tangent_result)
 
         self.update_mobjects(0)
-        print("1:" + str(angle_a.get_value(degrees=True)))
         self.play(
             dots[1].animate.move_to([
                 get_c()[0], 
@@ -620,7 +619,6 @@ class Proportions(Scene):
             ]),
             run_time=0.5
         )
-        print("2:" + str(angle_a.get_value(degrees=True)))
         self.play(Indicate(label_a)),
 
         self.play(
@@ -637,7 +635,7 @@ class Proportions(Scene):
         results.suspend_updating()
         self.play(Indicate(results))
         results.resume_updating()
-        self.wait()
+        self.wait(2)
 
         self.play(
             dots[1].animate.move_to([
@@ -661,7 +659,7 @@ class Proportions(Scene):
             dots.animate.scale(0.7),
             run_time=1
         )
-        self.wait()
+        self.wait(2)
 
         self.play(
             dots[1].animate.move_to([
@@ -685,14 +683,36 @@ class Proportions(Scene):
             dots.animate.scale(0.7),
             run_time=1
         )
+        self.wait()
 
         results.suspend_updating()
         self.play(Indicate(results))
         angle_a.suspend_updating()
         label_a.suspend_updating()
+        self.wait()
         self.play(
             Indicate(angle_a),
             Indicate(label_a)
+        )
+        self.wait()
+
+        self.play(
+            dots[1].animate.move_to([
+                get_c()[0], 
+                get_c()[1] + line_b.get_length() * math.tan(56/360*2*math.pi), 
+                0
+            ]),
+            run_time=0.5
+        )
+
+        self.play(
+            Transform(sine_ratio, MathTex(r"\sin(56^\circ) =").move_to(sine_ratio))
+        )
+        self.play(
+            Transform(cosine_ratio, MathTex(r"\cos(56^\circ) =").move_to(cosine_ratio))
+        )
+        self.play(
+            Transform(tangent_ratio, MathTex(r"\tan(56^\circ) =").move_to(tangent_ratio))
         )
 
         new_theta = MathTex(r"\theta", color=BLUE).next_to(angle_a, RIGHT, buff=0.1)
@@ -700,15 +720,10 @@ class Proportions(Scene):
             FadeOut(label_a),
             FadeIn(new_theta)
         )
-
         self.play(
-            Transform(sine_ratio, MathTex(r"\sin \theta =").move_to(sine_ratio))
-        )
-        self.play(
-            Transform(cosine_ratio, MathTex(r"\cos \theta =").move_to(cosine_ratio))
-        )
-        self.play(
-            Transform(tangent_ratio, MathTex(r"\tan \theta= ").move_to(tangent_ratio))
+            Transform(sine_ratio, MathTex(r"\sin \theta =").move_to(sine_ratio)),
+            Transform(cosine_ratio, MathTex(r"\cos \theta =").move_to(cosine_ratio)),
+            Transform(tangent_ratio, MathTex(r"\tan \theta =").move_to(tangent_ratio))
         )
 
 
