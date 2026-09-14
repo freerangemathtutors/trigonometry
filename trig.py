@@ -714,194 +714,202 @@ class Proportions(Scene):
         self.play(
             Transform(tangent_ratio, MathTex(r"\tan(56^\circ) =").move_to(tangent_ratio))
         )
-
+#---------------
         new_theta = MathTex(r"\theta", color=BLUE).next_to(angle_a, RIGHT, buff=0.1)
         self.play(
             FadeOut(label_a),
             FadeIn(new_theta)
         )
         self.play(
+            Indicate(new_theta)
+        ) 
+        new_theta.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
+
+        self.play(
             Transform(sine_ratio, MathTex(r"\sin \theta =").move_to(sine_ratio)),
             Transform(cosine_ratio, MathTex(r"\cos \theta =").move_to(cosine_ratio)),
             Transform(tangent_ratio, MathTex(r"\tan \theta =").move_to(tangent_ratio))
         )
+        self.wait()
 
+        label_d.clear_updaters()
+        label_e.clear_updaters()
+        label_f.clear_updaters()
+        copy_d.clear_updaters()
+        copy_e.clear_updaters()
+        copy_f.clear_updaters()
+        kopi_d.clear_updaters()
+        kopi_e.clear_updaters()
+        kopi_f.clear_updaters()
+        self.play(
+            Transform(label_d, MathTex("Opp.", color=ORANGE).move_to(label_d).rotate(-PI/2)),
+            Transform(label_e, MathTex("Adj.", color=RED).move_to(label_e)),
+            Transform(label_f, MathTex("Hyp.", color=GREEN).move_to(label_f).rotate(float(line_c.get_angle())))
+        )
 
-# class Similarity(Scene):
-#     def construct(self):
-#         # Setup geometry
-#         dots = VGroup(
-#             Dot([-1.5, -2.0, 0]).set_opacity(0),
-#             Dot([1.5, 2.0, 0]).set_opacity(0),
-#             Dot([1.5, -2.0, 0]).set_opacity(0)
-#         )
-#         get_a = lambda: dots[0].get_center()
-#         get_b = lambda: dots[1].get_center()
-#         get_c = lambda: dots[2].get_center()
+        self.play(
+            Transform(
+                sine_frac, 
+                MathTex(
+                    r"\frac{Opp.}{Hyp.}", 
+                    tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                    font_size=50
+                ).move_to(sine_frac).shift([-0.2, -0.05, 0])
+            ),
+            Transform(
+                cosine_frac, 
+                MathTex(
+                    r"\frac{Adj.}{Hyp.}", 
+                    tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                    font_size=50
+                ).move_to(cosine_frac).shift([-0.2, -0.05, 0])
+            ),
+            Transform(
+                tangent_frac, 
+                MathTex(
+                    r"\frac{Opp.}{Adj.}", 
+                    tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                    font_size=50
+                ).move_to(tangent_frac).shift([-0.2, -0.05, 0])
+            ),
+            Unwrite(sine_result),
+            Unwrite(cosine_result),
+            Unwrite(tangent_result),
+            FadeOut(copy_d),
+            FadeOut(kopi_d),
+            FadeOut(copy_e),
+            FadeOut(kopi_e),
+            FadeOut(copy_f),
+            FadeOut(kopi_f)
+        )
+        self.wait(3)
 
-#         line_a = Line(get_b(), get_c())
-#         line_b = Line(get_a(), get_c())
-#         line_c = Line(get_a(), get_b())
-#         line_a.add_updater(lambda mob: mob.put_start_and_end_on(get_b(), get_c()))
-#         line_b.add_updater(lambda mob: mob.put_start_and_end_on(get_a(), get_c()))
-#         line_c.add_updater(lambda mob: mob.put_start_and_end_on(get_a(), get_b()))
+        self.play(
+            Unwrite(sine_ratio),
+            Unwrite(cosine_ratio),
+            Unwrite(tangent_ratio),
+            Unwrite(sine_frac),
+            Unwrite(cosine_frac),
+            Unwrite(tangent_frac)
+        )
+        self.wait()
 
-#         big_tri = Polygon(get_a(), get_b(), get_c(), color=WHITE, stroke_width=4)
+        label_d.add_updater(
+            lambda mob: text_label(mob, line_a, (line_a, RIGHT), 0.3, "Opp.", ORANGE)
+        )
+        label_e.add_updater(
+            lambda mob: text_label(mob, line_b, (line_b, DOWN), 0.3, "Adj.", RED)
+        )
+        label_f.add_updater(
+            lambda mob: text_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, "Hyp.", GREEN)
+        )
+        label_f.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
 
-#         def update_triangle(mob):
-#             mob.set_points_as_corners([get_a(), get_b(), get_c(), get_a()])
-#         big_tri.add_updater(update_triangle)
+        box = Rectangle(WHITE, 3, 9).shift([2, -0.5, 0])
+        title = Tex(r"Find $\sin(50^\circ)$").move_to(title)
+        self.play(
+            Create(box),
+            Write(title),
+            dots.animate.shift([-1, 0, 0])
+        )
+        self.wait()
 
-#         angle_a = Angle(line_b, line_c, radius=0.7, color=BLUE).set_opacity(0)
-#         angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED).set_opacity(0)
-#         angle_c = RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
+        self.play(
+            dots[1].animate.move_to([
+                get_c()[0], 
+                get_c()[1] + line_b.get_length() * math.tan(50/360*2*math.pi), 
+                0
+            ]),
+            Transform(new_theta, MathTex(r"50^\circ", color=BLUE).next_to(angle_a, RIGHT, buff=0.1)),
+            run_time=0.5
+        )
+        self.play(
+            Indicate(new_theta)
+        )
+        self.wait()
 
-#         angle_a.add_updater(lambda mob: mob.become(
-#             Angle(line_b, line_c, radius=0.7, color=BLUE)
-#         ))
-#         angle_b.add_updater(lambda mob: mob.become(
-#             Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED)
-#         ))
-#         angle_c.add_updater(lambda mob: mob.become(
-#             RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
-#         ))
+        tex_ratio = MathTex(
+            r"\sin(50^\circ)=\frac{Opp.}{Hyp.}=",
+            tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+            font_size=50
+        ).next_to(box, LEFT, -4.9)
+        tex_frac = MathTex(
+            rf"\frac{{0.00}}{{0.00}} = {math.sin(math.radians(50)):.5f}",
+            color=BLUE_C,
+            tex_to_color_map={"0.00": BLACK}
+        ).next_to(box, RIGHT, -3.8).shift([0, 0.05, 0]).set_z_index(-1)
 
-#         label_a = MathTex(r"a", color=BLUE)
-#         label_b = MathTex(r"\phi", color=RED)
-#         label_c = MathTex(r"90^\circ", color=WHITE)
-#         label_d = Tex(r"Opposite", color=WHITE)
-#         label_e = Tex(r"Adjacent", color=WHITE)
-#         label_f = Tex(r"Hypotenuse", color=WHITE)
-#         label_opp = Tex(r"Opp.", color=WHITE)
-#         label_adj = Tex(r"Adj.", color=WHITE)
-#         label_hyp = Tex(r"Hyp.", color=WHITE)
-#         label_same = Tex(r"Similar!", color=YELLOW)
-#         label_angle = MathTex(r"0^\circ", color=BLUE)
+        self.play(
+            Write(tex_ratio)
+        )
 
-#         label_a.next_to(angle_a, RIGHT, buff=0.1)
-#         label_b.next_to(angle_b, DOWN, buff=0.1)
-#         label_c.next_to(angle_c, UP + LEFT, buff=0.1)
-#         label_d.next_to(line_a, RIGHT, buff=0.3)
-#         label_e.next_to(line_b, DOWN, buff=0.3)
-#         label_f.next_to(line_c, [0, 0, 0], buff=0.1)
-#         label_opp.next_to(line_a, RIGHT, buff=0.3)
-#         label_adj.next_to(line_b, DOWN, buff=0.3)
-#         label_hyp.next_to(line_c, [0, 0, 0], buff=0.1)
-#         label_angle.next_to(angle_a, RIGHT, buff=0.1)
-#         label_f.shift([0.5, 0, 0])
-#         label_same.shift([0, -3, 0])
+        label_d.clear_updaters()
+        label_e.clear_updaters()
+        label_f.clear_updaters()
+        self.play(
+            Transform(
+                label_d,
+                MathTex(f"{line_a.get_length():.2f}", color=ORANGE)
+                .move_to(label_d)
+                .rotate(-PI/2)
+            ),
+            Transform(
+                label_e,
+                MathTex(f"{line_b.get_length():.2f}", color=RED)
+                .move_to(label_e)
+            ),
+            Transform(
+                label_f,
+                MathTex(f"{line_c.get_length():.2f}", color=GREEN)
+                .move_to(label_f)
+                .rotate(float(line_c.get_angle()))
+            )
+        )
 
-#         label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
-#         label_b.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
-#         label_c.add_updater(lambda mob: mob.next_to(angle_c, UP + LEFT, buff=0.1))
-#         label_opp.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
-#         label_adj.add_updater(lambda mob: mob.next_to(angle_b, DOWN, buff=0.1))
-#         label_hyp.add_updater(lambda mob: mob.next_to(angle_c, UP + LEFT, buff=0.1))
+        copy_d = label_d.copy().clear_updaters()
+        copy_f = label_f.copy().clear_updaters()
 
-#         def length_label(label, line, location, buff):
-#             label.become(MathTex(f"{line.get_length():.2f}"))
-#             label.rotate(line.get_angle())
-#             label.next_to(*location, buff=buff)
+        self.add(copy_d, copy_f)
 
-#         def text_label(label, line, location, buff, text):
-#             label.become(MathTex(text))
-#             label.rotate(line.get_angle())
-#             label.next_to(*location, buff=buff)
+        self.play(
+            Write(tex_frac),
+            copy_d.animate.move_to(tex_frac.get_center() + [-1.2, 0.35, 0]).rotate(PI/2),
+            copy_f.animate.move_to(tex_frac.get_center() + [-1.2, -0.4, 0]).rotate(-float(line_c.get_angle()))
+        )
 
-#         label_d.add_updater(
-#             lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3)
-#         )
-#         label_e.add_updater(
-#             lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3)
-#         )
-#         label_f.add_updater(
-#             lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3)
-#         )
-#         label_f.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
+        label_d.add_updater(
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE)
+        )
+        label_e.add_updater(
+            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, RED)
+        )
+        label_f.add_updater(
+            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GREEN)
+        )
+        label_f.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
 
-#         label_opp.add_updater(
-#             lambda mob: text_label(mob, line_a, (line_a, RIGHT), 0.3, "Opp.")
-#         )
-#         label_adj.add_updater(
-#             lambda mob: text_label(mob, line_b, (line_b, DOWN), 0.3, "Adj.")
-#         )
-#         label_hyp.add_updater(
-#             lambda mob: text_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, "Hyp.")
-#         )
-#         label_hyp.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
-#         label_angle.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
+        copy_d.add_updater(
+            lambda mob: mob.become(
+                Tex(f"{line_a.get_length():.2f}", color=ORANGE).move_to(
+                    tex_frac.get_center() + [-1.2, 0.35, 0]
+                )
+            )
+        )
+        copy_f.add_updater(
+            lambda mob: mob.become(
+                Tex(f"{line_c.get_length():.2f}", color=GREEN).move_to(
+                    tex_frac.get_center() + [-1.2, -0.4, 0]
+                )
+            )
+        )
+        new_theta.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
 
-#         tri_copy = big_tri.copy()
-#         tri_copy.clear_updaters()
-        
-#         self.add(big_tri, line_a, line_b, line_c, angle_a, label_a, angle_c)
-#         for pos in dots:
-#             pos.shift([-3.0, 0, 0])
-#         tri_copy.shift([-3.0, 0, 0])
+        self.play(
+            dots.animate.scale(1.6),
+            rate_func=there_and_back,
+            run_time=2
+        )
 
-#         self.play(
-#             tri_copy.animate.shift([6.0, 0, 0]),
-#             FadeOut(angle_a),
-#             FadeOut(angle_c),
-#             FadeOut(label_a),
-#             run_time=0.5
-#         )
-#         self.wait(0.1)
-#         self.play(
-#             dots.animate.scale(1.25),
-#             tri_copy.animate.scale(0.8)
-#         )
-#         self.wait()
-#         self.play(
-#             dots.animate.scale(0.8),
-#             tri_copy.animate.scale(1.25)
-#         )
-#         self.play(
-#             tri_copy.animate.shift([-6.5, 0, 0]),
-#             dots.animate.shift([-0.5, 0, 0]),
-#             # dots[1].animate.shift([0, -0.0068, 0])
-#         )
-#         label_angle.become(MathTex(r"53^\circ", color=BLUE))
-#         self.remove(tri_copy)
-#         self.wait()
-
-#         label_a.clear_updaters()
-#         self.play(
-#             FadeIn(angle_a),
-#             FadeIn(angle_c),
-#             FadeIn(label_angle),
-#             Write(label_d),
-#             Write(label_e),
-#             Write(label_f)
-#         )
-#         self.wait()
-
-#         self.play(dots.animate.scale(1.25), run_time=2)
-#         self.play(dots.animate.scale(0.8), run_time=2)
-#         self.play(dots.animate.scale(0.8), run_time=2)
-#         self.play(dots.animate.scale(1.25), run_time=2)
-
-#         copy_d = label_d.copy().clear_updaters()
-#         copy_e = label_e.copy().clear_updaters()
-#         copy_f = label_f.copy().clear_updaters()
-#         label_d.clear_updaters()
-#         label_e.clear_updaters()
-#         label_f.clear_updaters()
-        
-#         self.play(
-#             label_d.animate.move_to([1.0, 2.0, 0]).rotate(PI / 2),
-#             copy_d.animate.move_to([1.0, 1.0, 0]).rotate(PI / 2),
-#             label_e.animate.move_to([2.0, 2.0, 0]),
-#             copy_e.animate.move_to([2.0, 1.0, 0]),
-#             label_f.animate.move_to([3.0, 2.0, 0]).rotate(-float(line_c.get_angle())),
-#             copy_f.animate.move_to([3.0, 1.0, 0]).rotate(-float(line_c.get_angle())),
-#         )
-
-#         label_d.add_updater(lambda mob: mob.become(MathTex(f"{line_a.get_length():.2f}")))
-#         label_d.add_updater(lambda mob: mob.become(MathTex(f"{line_b.get_length():.2f}")))
-#         label_d.add_updater(lambda mob: mob.become(MathTex(f"{line_c.get_length():.2f}")))
-#         copy_d.add_updater(lambda mob: mob.become(MathTex(f"{line_a.get_length():.2f}")))
-#         copy_e.add_updater(lambda mob: mob.become(MathTex(f"{line_b.get_length():.2f}")))
-#         copy_f.add_updater(lambda mob: mob.become(MathTex(f"{line_c.get_length():.2f}")))
+        self.wait()
 
 
