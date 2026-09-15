@@ -619,6 +619,10 @@ class Proportions(Scene):
             ]),
             run_time=0.5
         )
+        self.play(
+            dots.animate.move_to([-4, 0, 0]),
+            run_time=0.5
+        )
         self.play(Indicate(label_a)),
 
         self.play(
@@ -645,6 +649,10 @@ class Proportions(Scene):
             ]),
             run_time=0.5
         )
+        self.play(
+            dots.animate.move_to([-4, 0, 0]),
+            run_time=0.5
+        )
         results.suspend_updating()
         self.play(Indicate(results))
         results.resume_updating()
@@ -667,6 +675,10 @@ class Proportions(Scene):
                 get_c()[1] + line_b.get_length() * math.tan(36/360*2*math.pi), 
                 0
             ]),
+            run_time=0.5
+        )
+        self.play(
+            dots.animate.move_to([-4, 0, 0]),
             run_time=0.5
         )
         results.suspend_updating()
@@ -702,6 +714,10 @@ class Proportions(Scene):
                 get_c()[1] + line_b.get_length() * math.tan(56/360*2*math.pi), 
                 0
             ]),
+            run_time=0.5
+        )
+        self.play(
+            dots.animate.move_to([-4, 0, 0]),
             run_time=0.5
         )
 
@@ -742,9 +758,9 @@ class Proportions(Scene):
         kopi_e.clear_updaters()
         kopi_f.clear_updaters()
         self.play(
-            Transform(label_d, MathTex("Opp.", color=ORANGE).move_to(label_d).rotate(-PI/2)),
-            Transform(label_e, MathTex("Adj.", color=RED).move_to(label_e)),
-            Transform(label_f, MathTex("Hyp.", color=GREEN).move_to(label_f).rotate(float(line_c.get_angle())))
+            Transform(label_d, Tex("Opp.", color=ORANGE).move_to(label_d).rotate(-PI/2)),
+            Transform(label_e, Tex("Adj.", color=RED).move_to(label_e)),
+            Transform(label_f, Tex("Hyp.", color=GREEN).move_to(label_f).rotate(float(line_c.get_angle())))
         )
 
         self.play(
@@ -909,7 +925,23 @@ class Proportions(Scene):
             rate_func=there_and_back,
             run_time=2
         )
-
         self.wait()
 
-
+        self.play(
+            Unwrite(new_theta),
+            Unwrite(label_d),
+            Unwrite(label_e),
+            Unwrite(label_f),
+            Unwrite(title),
+            Unwrite(tex_frac),
+            Unwrite(tex_ratio),
+            Uncreate(box),
+            Unwrite(copy_d),
+            Unwrite(copy_f)
+        )
+        self.play(
+            dots[0].animate.move_to([-5.5, -2.0, 0]),
+            dots[1].animate.move_to([-2.5, 2.0, 0]),
+            dots[2].animate.move_to([-2.5, -2.0, 0])
+        )
+        self.wait()
