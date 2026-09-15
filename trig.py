@@ -2,6 +2,9 @@ from manim import *
 import math
 import copy
 
+# Please excuse the mess and try not to trip on the spaghetti ;)
+# It gets better in more-trig.py
+
 # config.renderer = "opengl"
 
 class Intro(Scene):
@@ -31,14 +34,14 @@ class Intro(Scene):
         big_tri.add_updater(update_triangle)
 
         angle_a = Angle(line_b, line_c, radius=0.7, color=BLUE).set_opacity(0).set_stroke(BLUE, 0.3)
-        angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED).set_opacity(0)
+        angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=GREEN).set_opacity(0)
         angle_c = RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
 
         angle_a.add_updater(lambda mob: mob.become(
             Angle(line_b, line_c, radius=0.7, color=BLUE)
         ))
         angle_b.add_updater(lambda mob: mob.become(
-            Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED)
+            Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=GREEN)
         ))
         angle_c.add_updater(lambda mob: mob.become(
             RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
@@ -48,7 +51,7 @@ class Intro(Scene):
         with register_font("Teachers-Medium.ttf"):
             Text.set_default(font="Teachers")
             label_a = MathTex(r"a", color=BLUE).set_opacity(0)
-            label_b = MathTex(r"b", color=RED).set_opacity(0)
+            label_b = MathTex(r"b", color=GREEN).set_opacity(0)
             label_c = MathTex(r"90^\circ", color=WHITE)
             label_d = Tex(r"Opposite", color=WHITE).set_opacity(0)
             label_e = Tex(r"Adjacent", color=WHITE).set_opacity(0)
@@ -145,7 +148,7 @@ class Intro(Scene):
         angle_e = Angle(
             Line(copy_vertices[1], copy_vertices[0]), 
             Line(copy_vertices[1], copy_vertices[2]), 
-            radius=0.4, color=RED
+            radius=0.4, color=GREEN
         ).set_opacity(0).set_fill(0)
         line_d = Line(copy_vertices[2], copy_vertices[1])
         line_e = Line(copy_vertices[0], copy_vertices[2])
@@ -312,14 +315,14 @@ class Proportions(Scene):
         big_tri.add_updater(update_triangle)
 
         angle_a = Angle(line_b, line_c, radius=0.7, color=BLUE)
-        angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED).set_opacity(0)
+        angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=GREEN).set_opacity(0)
         angle_c = RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
 
         angle_a.add_updater(lambda mob: mob.become(
             Angle(line_b, line_c, radius=0.7, color=BLUE)
         ))
         angle_b.add_updater(lambda mob: mob.become(
-            Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED)
+            Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=GREEN)
         ))
         angle_c.add_updater(lambda mob: mob.become(
             RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
@@ -329,11 +332,11 @@ class Proportions(Scene):
         with register_font("Teachers-Medium.ttf"):
             Text.set_default(font="Teachers")
             label_a = MathTex(r"\theta", color=BLUE)
-            label_b = MathTex(r"\phi", color=RED)
+            label_b = MathTex(r"\phi", color=GREEN)
             label_c = MathTex(r"90^\circ", color=WHITE)
-            label_d = Tex(r"Opposite", color=ORANGE)
-            label_e = Tex(r"Adjacent", color=RED)
-            label_f = Tex(r"Hypotenuse", color=GREEN)
+            label_d = Tex(r"Opposite", color=TEAL)
+            label_e = Tex(r"Adjacent", color=GREEN)
+            label_f = Tex(r"Hypotenuse", color=GOLD)
             label_opp = Tex(r"Opp.", color=WHITE)
             label_adj = Tex(r"Adj.", color=WHITE)
             label_hyp = Tex(r"Hyp.", color=WHITE)
@@ -345,17 +348,17 @@ class Proportions(Scene):
             title = Text("Proportions")
             sine_ratio = MathTex(
                 r"\frac{Opp.}{Hyp.}=", 
-                tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
                 font_size=50
             )
             cosine_ratio = MathTex(
                 r"\frac{Adj.}{Hyp.}=", 
-                tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
                 font_size=50
             )
             tangent_ratio = MathTex(
                 r"\frac{Opp.}{Adj.}=", 
-                tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
                 font_size=50
             )
             sine_frac = MathTex(
@@ -433,13 +436,13 @@ class Proportions(Scene):
             )
 
         label_d.add_updater(
-            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE)
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, TEAL)
         )
         label_e.add_updater(
-            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, RED)
+            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, GREEN)
         )
         label_f.add_updater(
-            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GREEN)
+            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GOLD)
         )
         label_f.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
 
@@ -549,22 +552,22 @@ class Proportions(Scene):
         self.wait()
 
         copy_d.add_updater(
-            lambda mob: length_label(mob, line_a, (sine_frac.get_center()+[-0.3, 0.35, 0]), 0, ORANGE, True)
+            lambda mob: length_label(mob, line_a, (sine_frac.get_center()+[-0.3, 0.35, 0]), 0, TEAL, True)
         )
         kopi_d.add_updater(
-            lambda mob: length_label(mob, line_a, (tangent_frac.get_center()+[-0.3, 0.35, 0]), 0, ORANGE, True)
+            lambda mob: length_label(mob, line_a, (tangent_frac.get_center()+[-0.3, 0.35, 0]), 0, TEAL, True)
         )
         copy_e.add_updater(
-            lambda mob: length_label(mob, line_b, (cosine_frac.get_center()+[-0.3, 0.35, 0]), 0, RED, True)
+            lambda mob: length_label(mob, line_b, (cosine_frac.get_center()+[-0.3, 0.35, 0]), 0, GREEN, True)
         )
         kopi_e.add_updater(
-            lambda mob: length_label(mob, line_b, (tangent_frac.get_center()+[-0.3, -0.4, 0]), 0, RED, True)
+            lambda mob: length_label(mob, line_b, (tangent_frac.get_center()+[-0.3, -0.4, 0]), 0, GREEN, True)
         )
         copy_f.add_updater(
-            lambda mob: length_label(mob, line_c, (sine_frac.get_center()+[-0.3, -0.4, 0]), 0, GREEN, True)
+            lambda mob: length_label(mob, line_c, (sine_frac.get_center()+[-0.3, -0.4, 0]), 0, GOLD, True)
         )
         kopi_f.add_updater(
-            lambda mob: length_label(mob, line_c, (cosine_frac.get_center()+[-0.3, -0.4, 0]), 0, GREEN, True)
+            lambda mob: length_label(mob, line_c, (cosine_frac.get_center()+[-0.3, -0.4, 0]), 0, GOLD, True)
         )
 
         self.play(
@@ -730,7 +733,7 @@ class Proportions(Scene):
         self.play(
             Transform(tangent_ratio, MathTex(r"\tan(56^\circ) =").move_to(tangent_ratio))
         )
-#---------------
+
         new_theta = MathTex(r"\theta", color=BLUE).next_to(angle_a, RIGHT, buff=0.1)
         self.play(
             FadeOut(label_a),
@@ -758,9 +761,9 @@ class Proportions(Scene):
         kopi_e.clear_updaters()
         kopi_f.clear_updaters()
         self.play(
-            Transform(label_d, Tex("Opp.", color=ORANGE).move_to(label_d).rotate(-PI/2)),
-            Transform(label_e, Tex("Adj.", color=RED).move_to(label_e)),
-            Transform(label_f, Tex("Hyp.", color=GREEN).move_to(label_f).rotate(float(line_c.get_angle())))
+            Transform(label_d, Tex("Opp.", color=TEAL).move_to(label_d).rotate(-PI/2)),
+            Transform(label_e, Tex("Adj.", color=GREEN).move_to(label_e)),
+            Transform(label_f, Tex("Hyp.", color=GOLD).move_to(label_f).rotate(float(line_c.get_angle())))
         )
 
         self.play(
@@ -768,7 +771,7 @@ class Proportions(Scene):
                 sine_frac, 
                 MathTex(
                     r"\frac{Opp.}{Hyp.}", 
-                    tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                    tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
                     font_size=50
                 ).move_to(sine_frac).shift([-0.2, -0.05, 0])
             ),
@@ -776,7 +779,7 @@ class Proportions(Scene):
                 cosine_frac, 
                 MathTex(
                     r"\frac{Adj.}{Hyp.}", 
-                    tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                    tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
                     font_size=50
                 ).move_to(cosine_frac).shift([-0.2, -0.05, 0])
             ),
@@ -784,7 +787,7 @@ class Proportions(Scene):
                 tangent_frac, 
                 MathTex(
                     r"\frac{Opp.}{Adj.}", 
-                    tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+                    tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
                     font_size=50
                 ).move_to(tangent_frac).shift([-0.2, -0.05, 0])
             ),
@@ -811,13 +814,13 @@ class Proportions(Scene):
         self.wait()
 
         label_d.add_updater(
-            lambda mob: text_label(mob, line_a, (line_a, RIGHT), 0.3, "Opp.", ORANGE)
+            lambda mob: text_label(mob, line_a, (line_a, RIGHT), 0.3, "Opp.", TEAL)
         )
         label_e.add_updater(
-            lambda mob: text_label(mob, line_b, (line_b, DOWN), 0.3, "Adj.", RED)
+            lambda mob: text_label(mob, line_b, (line_b, DOWN), 0.3, "Adj.", GREEN)
         )
         label_f.add_updater(
-            lambda mob: text_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, "Hyp.", GREEN)
+            lambda mob: text_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, "Hyp.", GOLD)
         )
         label_f.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
 
@@ -846,7 +849,7 @@ class Proportions(Scene):
 
         tex_ratio = MathTex(
             r"\sin(50^\circ)=\frac{Opp.}{Hyp.}=",
-            tex_to_color_map={"Opp.": ORANGE, "Adj.": RED, "Hyp.": GREEN},
+            tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
             font_size=50
         ).next_to(box, LEFT, -4.9)
         tex_frac = MathTex(
@@ -865,18 +868,18 @@ class Proportions(Scene):
         self.play(
             Transform(
                 label_d,
-                MathTex(f"{line_a.get_length():.2f}", color=ORANGE)
+                MathTex(f"{line_a.get_length():.2f}", color=TEAL)
                 .move_to(label_d)
                 .rotate(-PI/2)
             ),
             Transform(
                 label_e,
-                MathTex(f"{line_b.get_length():.2f}", color=RED)
+                MathTex(f"{line_b.get_length():.2f}", color=GREEN)
                 .move_to(label_e)
             ),
             Transform(
                 label_f,
-                MathTex(f"{line_c.get_length():.2f}", color=GREEN)
+                MathTex(f"{line_c.get_length():.2f}", color=GOLD)
                 .move_to(label_f)
                 .rotate(float(line_c.get_angle()))
             )
@@ -894,26 +897,26 @@ class Proportions(Scene):
         )
 
         label_d.add_updater(
-            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, ORANGE)
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, TEAL)
         )
         label_e.add_updater(
-            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, RED)
+            lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, GREEN)
         )
         label_f.add_updater(
-            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GREEN)
+            lambda mob: length_label(mob, line_c, (line_c, [0, 0, 0]), -0.3, GOLD)
         )
         label_f.add_updater(lambda mob: mob.shift([-0.5, 0, 0]))
 
         copy_d.add_updater(
             lambda mob: mob.become(
-                Tex(f"{line_a.get_length():.2f}", color=ORANGE).move_to(
+                Tex(f"{line_a.get_length():.2f}", color=TEAL).move_to(
                     tex_frac.get_center() + [-1.2, 0.35, 0]
                 )
             )
         )
         copy_f.add_updater(
             lambda mob: mob.become(
-                Tex(f"{line_c.get_length():.2f}", color=GREEN).move_to(
+                Tex(f"{line_c.get_length():.2f}", color=GOLD).move_to(
                     tex_frac.get_center() + [-1.2, -0.4, 0]
                 )
             )
