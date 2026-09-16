@@ -78,14 +78,12 @@ class Unitcircle(Scene):
             6, 6, faded_line_ratio=2
         )
         self.grid_coords = VGroup(
-            Tex("1").move_to([3, 0, 0]),
-            Tex("1").move_to([0, 3, 0]),
-            Tex("-1").move_to([-3, 0, 0]),
-            Tex("-1").move_to([0, -3, 0])
+            Tex("1").move_to([3.2, 0, 0]),
+            Tex("1").move_to([0, 3.3, 0]),
+            Tex("-1").move_to([-3.3, 0, 0]),
+            Tex("-1").move_to([0, -3.3, 0])
         )
-        self.circle = Circle(
-            3
-        )
+        self.circle = Circle(3).rotate(math.radians(53.13))
         
         self.add(
             self.dots, 
@@ -95,8 +93,7 @@ class Unitcircle(Scene):
             self.line_c, 
             self.angle_a, 
             self.angle_c,
-            self.label_f, 
-            self.circle
+            self.label_f
         )
         self.update_mobjects(0)
         self.init_scale = self.line_c.get_length()
@@ -124,6 +121,14 @@ class Unitcircle(Scene):
         self.play(
             Transform(self.grid_cir, self.grid_big.scale(3)),
             Write(self.grid_coords)
+        )
+        self.wait()
+
+        #completely rebuild dot updaters
+        #dot b gets colour
+        self.play(
+            Create(self.circle),
+            run_time=2
         )
 
 

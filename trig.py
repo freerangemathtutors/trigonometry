@@ -34,14 +34,14 @@ class Intro(Scene):
         big_tri.add_updater(update_triangle)
 
         angle_a = Angle(line_b, line_c, radius=0.7, color=BLUE).set_opacity(0).set_stroke(BLUE, 0.3)
-        angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=GREEN).set_opacity(0)
+        angle_b = Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED).set_opacity(0)
         angle_c = RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
 
         angle_a.add_updater(lambda mob: mob.become(
             Angle(line_b, line_c, radius=0.7, color=BLUE)
         ))
         angle_b.add_updater(lambda mob: mob.become(
-            Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=GREEN)
+            Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=RED)
         ))
         angle_c.add_updater(lambda mob: mob.become(
             RightAngle(Line(get_c(), get_b()), Line(get_c(), get_a()), length=0.4, color=WHITE)
@@ -51,11 +51,11 @@ class Intro(Scene):
         with register_font("Teachers-Medium.ttf"):
             Text.set_default(font="Teachers")
             label_a = MathTex(r"a", color=BLUE).set_opacity(0)
-            label_b = MathTex(r"b", color=GREEN).set_opacity(0)
+            label_b = MathTex(r"b", color=RED).set_opacity(0)
             label_c = MathTex(r"90^\circ", color=WHITE)
-            label_d = Tex(r"Opposite", color=WHITE).set_opacity(0)
-            label_e = Tex(r"Adjacent", color=WHITE).set_opacity(0)
-            label_f = Tex(r"Hypotenuse", color=WHITE)
+            label_d = Tex(r"Opposite", color=TEAL_B).set_opacity(0)
+            label_e = Tex(r"Adjacent", color=GREEN).set_opacity(0)
+            label_f = Tex(r"Hypotenuse", color=GOLD)
             label_same = Text("Similar", color=YELLOW)
             label_prop = Text("Proportions", color=YELLOW)
             detour_box = Rectangle(WHITE, 5.5, 9.6)
@@ -148,7 +148,7 @@ class Intro(Scene):
         angle_e = Angle(
             Line(copy_vertices[1], copy_vertices[0]), 
             Line(copy_vertices[1], copy_vertices[2]), 
-            radius=0.4, color=GREEN
+            radius=0.4, color=RED
         ).set_opacity(0).set_fill(0)
         line_d = Line(copy_vertices[2], copy_vertices[1])
         line_e = Line(copy_vertices[0], copy_vertices[2])
@@ -268,6 +268,30 @@ class Intro(Scene):
 
         self.play(Write(label_e))
         self.wait(1.5)
+
+        label_a.clear_updaters()
+        angle_a.clear_updaters()
+        angle_b.clear_updaters()
+        angle_b.become(Angle(Line(get_b(), get_a()), line_a, radius=0.7, color=BLUE).set_opacity(1))
+        self.play(
+            label_a.animate.next_to(angle_b, DOWN, buff=0.1),
+            label_d.animate.next_to(line_b, DOWN, buff=0.3),
+            label_e.animate.next_to(line_a, RIGHT, buff=0.3),
+            Create(angle_b),
+            angle_a.animate.set_opacity(0)
+        )
+        self.wait(1.5)
+        self.play(
+            label_a.animate.next_to(angle_a, RIGHT, buff=0.1),
+            label_d.animate.next_to(line_a, RIGHT, buff=0.3),
+            label_e.animate.next_to(line_b, DOWN, buff=0.3),
+            Uncreate(angle_b),
+            angle_a.animate.set_opacity(1).set_fill(opacity=0)
+        )
+        label_a.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
+        angle_a.add_updater(lambda mob: mob.become(
+            Angle(line_b, line_c, radius=0.7, color=BLUE)
+        ))
 
         self.play(
             AnimationGroup(
