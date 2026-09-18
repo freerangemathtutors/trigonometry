@@ -5,9 +5,9 @@ import math
 
 def setup(scene):
     scene.dots = VGroup(
-        Dot([-1.5, -2.0, 0]).set_opacity(0),
-        Dot([1.5, 2.0, 0]).set_opacity(0),
-        Dot([1.5, -2.0, 0]).set_opacity(0)
+        Dot([-1.5, -2.0, 0], radius=0.2, color=YELLOW).set_opacity(0),
+        Dot([1.5, 2.0, 0], radius=0.2, color=YELLOW).set_opacity(0),
+        Dot([1.5, -2.0, 0], radius=0.2, color=YELLOW).set_opacity(0)
     )
     scene.get_a = lambda: scene.dots[0].get_center()
     scene.get_b = lambda: scene.dots[1].get_center()
@@ -46,21 +46,34 @@ def setup(scene):
         scene.label_a = MathTex(r"\theta", color=scene.colours["angle_a"]).next_to(scene.angle_a, RIGHT, buff=0.1)
         scene.label_b = MathTex(r"\phi", color=scene.colours["angle_b"]).next_to(scene.angle_b, DOWN, buff=0.1)
         scene.label_c = MathTex(r"90^\circ", color=scene.colours["angle_c"]).next_to(scene.angle_c, UP + LEFT, buff=0.1)
-        scene.label_d = Tex(r"Opp", color=WHITE).next_to(scene.line_a, RIGHT, buff=0.3).set_opacity(0)
-        scene.label_e = Tex(r"Adj", color=WHITE).next_to(scene.line_b, DOWN, buff=0.3).set_opacity(0)
-        scene.label_f = Tex(r"1", color=WHITE).next_to(scene.line_c, LEFT, buff=0.1).set_opacity(0)
+        scene.label_d = MathTex(r"Opp", color=scene.colours["opp"]).next_to(scene.line_a, RIGHT, buff=0.3).set_opacity(0)
+        scene.label_e = MathTex(r"Adj", color=scene.colours["adj"]).next_to(scene.line_b, DOWN, buff=0.3).set_opacity(0)
+        scene.label_f = MathTex(r"1", color=scene.colours["hyp"]).next_to(scene.line_c, LEFT, buff=0.1).set_opacity(0)
+
+    scene.label_a.add_updater(lambda mob: mob.next_to(scene.angle_a, RIGHT, buff=0.1))
+    scene.label_b.add_updater(lambda mob: mob.next_to(scene.angle_b, DOWN, buff=0.1))
+    scene.label_c.add_updater(lambda mob: mob.next_to(scene.angle_c, UP + LEFT, buff=0.1))
+    scene.label_d.add_updater(lambda mob: mob.next_to(scene.line_a, RIGHT, buff=0.3))
+    scene.label_e.add_updater(lambda mob: mob.next_to(scene.line_b, DOWN, buff=0.3))
+    scene.label_f.add_updater(lambda mob: mob.next_to(scene.line_c, LEFT, buff=0.1).shift([0.6, 0, 0]))
 
 class Unitcircle(Scene):
     colours = {
         "hyp": GOLD,
-        "opp": TEAL,
+        "opp": TEAL_B,
         "adj": GREEN,
         "tri_out": WHITE,
         "tri_in": BLUE,
         "tri_in_op": 0.3,
         "angle_a": BLUE,
         "angle_b": RED, 
-        "angle_c": WHITE
+        "angle_c": WHITE,
+        "colour_map": {
+            "Opp.": TEAL_B, 
+            "Adj.": GREEN, 
+            "Hyp.": GOLD, 
+            "1": GOLD
+        }
     }
 
     def construct(self):
@@ -78,12 +91,37 @@ class Unitcircle(Scene):
             6, 6, faded_line_ratio=2
         )
         self.grid_coords = VGroup(
-            Tex("1").move_to([3.2, 0, 0]),
-            Tex("1").move_to([0, 3.3, 0]),
-            Tex("-1").move_to([-3.3, 0, 0]),
-            Tex("-1").move_to([0, -3.3, 0])
+            Tex("1").move_to([3.3, 0.3, 0]),
+            Tex("1").move_to([0.3, 3.3, 0]),
+            Tex("-1").move_to([-3.3, 0.3, 0]),
+            Tex("-1").move_to([0.3, -3.3, 0])
         )
         self.circle = Circle(3).rotate(math.radians(53.13))
+        self.o_arm = Line(ORIGIN, 3*RIGHT)
+        self.sine_ratio = MathTex(
+            r"\sin \theta = \frac{",
+            r"\mathrm{Opp.}",
+            r"}{",
+            r"\mathrm{Hyp.}",
+            r"}",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([4, 0, 0])
+        self.cosine_ratio = MathTex(
+            r"\cos \theta = \frac{",
+            r"\mathrm{Adj.}",
+            r"}{",
+            r"\mathrm{Hyp.}",
+            r"}",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([4, 0, 0])
+        self.sine_formula = MathTex(
+            r"\sin \theta = \mathrm{Opp.}",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        )
+        self.cover = Rectangle(BLACK, 10, 10).set_fill(BLACK, 1)
         
         self.add(
             self.dots, 
@@ -124,14 +162,150 @@ class Unitcircle(Scene):
         )
         self.wait()
 
-        #completely rebuild dot updaters
-        #dot b gets colour
+        self.dots[2].add_updater(lambda dot: perpendicular_dot(dot, self.dots[1], [0, 0, 0]))
+        self.angle_a.add_updater(lambda mob: mob.become(
+            Angle(
+                self.o_arm, self.line_c, 
+                radius=angle_radius(self), 
+                color=self.colours["angle_a"]
+            )
+        ))
+
+        self.dots[1].set_color(YELLOW).set_z_index(10)
         self.play(
-            Create(self.circle),
-            run_time=2
+            self.dots[1].animate.set_opacity(1)
         )
 
+        # Everything now redefined to unit circle
+        self.play(
+            Create(self.circle),
+            MoveAlongPath(self.dots[1], self.circle),
+            run_time=2,
+            rate_func=smooth
+        )
+        self.cover.move_to([10, 0, 0])
+        self.play(
+            self.circle.animate.shift([-3, 0, 0]),
+            self.grid_coords.animate.shift([-3, 0, 0]),
+            self.dots.animate.shift([-3, 0, 0]),
+            self.grid_cir.animate.shift([-3, 0, 0]),
+            self.cover.animate.move_to([6, 0, 0])
+        )
+        self.wait()
+        self.label_d.set_opacity(1)
+        self.label_e.set_opacity(1)
+        self.label_f.set_opacity(1)
+        self.add(self.label_d, self.label_e, self.label_f)
+        self.update_mobjects(0)
+        self.play(
+            Write(self.label_d),
+            Write(self.label_e),
+            Write(self.label_f),
+            Write(self.label_a)
+        )
+        self.play(Write(self.sine_ratio))
+        self.wait()
+        self.play(
+            Transform(
+                self.sine_ratio[3],
+                MathTex(
+                    r"1",
+                    color=self.colours["hyp"],
+                    font_size=50
+                ).move_to(self.sine_ratio[3])
+            )
+        )
+        self.wait()
+        self.sine_formula.move_to(self.sine_ratio)
+        print(self.sine_ratio.submobjects)
+        new_left = MathTex(
+            r"\sin \theta =",
+            font_size=50
+        ).move_to(self.sine_ratio[0])
 
+        new_opp = MathTex(
+            r"\mathrm{Opp.}",
+            color=self.colours["opp"],
+            font_size=50
+        ).move_to([self.sine_ratio[1].get_center()[0], 0, 0])
+
+        self.play(
+            Unwrite(self.sine_ratio[2]),
+            Unwrite(self.sine_ratio[3]),
+            Unwrite(self.sine_ratio[4]),
+            Transform(self.sine_ratio[1], new_opp)
+        )
+        self.wait()
+        self.play(Transform(
+            self.label_d,
+            MathTex(r"\sin \theta", color=self.colours["opp"])
+            .next_to(self.line_a, RIGHT, buff=0.3)
+        ))
+        self.play(Indicate(self.label_d))
+        self.wait()
+
+        self.play(
+            Unwrite(self.sine_ratio[0]),
+            Unwrite(self.sine_ratio[1]),
+            Unwrite(new_opp)
+        )
+
+        new_adj = MathTex(
+            r"\mathrm{Adj.}",
+            color=self.colours["adj"],
+            font_size=50
+        ).move_to([self.cosine_ratio[1].get_center()[0], 0, 0])
+        self.play(Write(self.cosine_ratio))
+        self.wait()
+        self.play(
+            Transform(
+                self.cosine_ratio[3],
+                MathTex(
+                    r"1",
+                    color=self.colours["hyp"],
+                    font_size=50
+                ).move_to(self.sine_ratio[3])
+            )
+        )
+        self.play(
+            Unwrite(self.cosine_ratio[2]),
+            Unwrite(self.cosine_ratio[3]),
+            Unwrite(self.cosine_ratio[4]),
+            Transform(self.cosine_ratio[1], new_adj)
+        )
+        self.play(Transform(
+            self.label_e,
+            MathTex(r"\cos \theta", color=self.colours["adj"])
+            .next_to(self.line_b, DOWN, buff=0.3)
+        ))
+        self.play(Indicate(self.label_e))
+        self.wait()
+
+        self.play(
+            Unwrite(self.cosine_ratio),
+            Unwrite(new_adj)
+        )
+
+        with register_font("Teachers-Medium.ttf"):
+            Text.set_default(font="Teachers")
+            question = Text("What is a\ntangent line?").move_to([4, 0, 0])
+
+        self.play(Write(question))
+        self.wait()
+        self.tangent_segment = Line([-0.5, 0, 0], [0.5, 0, 0])
+        self.dot_d = Dot(self.dots[1].get_center() * [1, -1, 1], radius=0.2, color=YELLOW)
+        self.arc_segment = Arc(3, 0, PI/2, arc_center=[-4, 0, 0]).rotate(-PI/2).set_z_index(-1)
+
+        # self.tangent_segment.add_updater(
+        #     lambda mob: mob
+        # )
+
+def perpendicular_dot(dot, target, centre=[0, 0, 0]):
+    target_pos = target.get_center()
+    sine = -float(target_pos[1] - centre[1])
+    dot.move_to(
+        [target_pos[0], target_pos[1]+sine, target_pos[2]]
+    )
 
 def angle_radius(scene):
     return 0.7 * scene.line_c.get_length() / scene.init_scale

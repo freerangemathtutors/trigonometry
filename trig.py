@@ -304,7 +304,7 @@ class Intro(Scene):
                     lag_ratio=0
                 ),
                 AnimationGroup(
-                    *(pos.animate.shift([-4.5, 0, 0]) for pos in dots), 
+                    *(pos.animate.shift([-4.0, 0, 0]) for pos in dots), 
                     lag_ratio=0
                 ),
                 lag_ratio=0.5
@@ -358,7 +358,7 @@ class Proportions(Scene):
             label_a = MathTex(r"\theta", color=BLUE)
             label_b = MathTex(r"\phi", color=GREEN)
             label_c = MathTex(r"90^\circ", color=WHITE)
-            label_d = Tex(r"Opposite", color=TEAL)
+            label_d = Tex(r"Opposite", color=TEAL_B)
             label_e = Tex(r"Adjacent", color=GREEN)
             label_f = Tex(r"Hypotenuse", color=GOLD)
             label_opp = Tex(r"Opp.", color=WHITE)
@@ -372,17 +372,17 @@ class Proportions(Scene):
             title = Text("Proportions")
             sine_ratio = MathTex(
                 r"\frac{Opp.}{Hyp.}=", 
-                tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
+                tex_to_color_map={"Opp.": TEAL_B, "Adj.": GREEN, "Hyp.": GOLD},
                 font_size=50
             )
             cosine_ratio = MathTex(
                 r"\frac{Adj.}{Hyp.}=", 
-                tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
+                tex_to_color_map={"Opp.": TEAL_B, "Adj.": GREEN, "Hyp.": GOLD},
                 font_size=50
             )
             tangent_ratio = MathTex(
                 r"\frac{Opp.}{Adj.}=", 
-                tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
+                tex_to_color_map={"Opp.": TEAL_B, "Adj.": GREEN, "Hyp.": GOLD},
                 font_size=50
             )
             sine_frac = MathTex(
@@ -460,7 +460,7 @@ class Proportions(Scene):
             )
 
         label_d.add_updater(
-            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, TEAL)
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, TEAL_B)
         )
         label_e.add_updater(
             lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, GREEN)
@@ -576,10 +576,10 @@ class Proportions(Scene):
         self.wait()
 
         copy_d.add_updater(
-            lambda mob: length_label(mob, line_a, (sine_frac.get_center()+[-0.3, 0.35, 0]), 0, TEAL, True)
+            lambda mob: length_label(mob, line_a, (sine_frac.get_center()+[-0.3, 0.35, 0]), 0, TEAL_B, True)
         )
         kopi_d.add_updater(
-            lambda mob: length_label(mob, line_a, (tangent_frac.get_center()+[-0.3, 0.35, 0]), 0, TEAL, True)
+            lambda mob: length_label(mob, line_a, (tangent_frac.get_center()+[-0.3, 0.35, 0]), 0, TEAL_B, True)
         )
         copy_e.add_updater(
             lambda mob: length_label(mob, line_b, (cosine_frac.get_center()+[-0.3, 0.35, 0]), 0, GREEN, True)
@@ -785,7 +785,7 @@ class Proportions(Scene):
         kopi_e.clear_updaters()
         kopi_f.clear_updaters()
         self.play(
-            Transform(label_d, Tex("Opp.", color=TEAL).move_to(label_d).rotate(-PI/2)),
+            Transform(label_d, Tex("Opp.", color=TEAL_B).move_to(label_d).rotate(-PI/2)),
             Transform(label_e, Tex("Adj.", color=GREEN).move_to(label_e)),
             Transform(label_f, Tex("Hyp.", color=GOLD).move_to(label_f).rotate(float(line_c.get_angle())))
         )
@@ -795,7 +795,7 @@ class Proportions(Scene):
                 sine_frac, 
                 MathTex(
                     r"\frac{Opp.}{Hyp.}", 
-                    tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
+                    tex_to_color_map={"Opp.": TEAL_B, "Adj.": GREEN, "Hyp.": GOLD},
                     font_size=50
                 ).move_to(sine_frac).shift([-0.2, -0.05, 0])
             ),
@@ -803,7 +803,7 @@ class Proportions(Scene):
                 cosine_frac, 
                 MathTex(
                     r"\frac{Adj.}{Hyp.}", 
-                    tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
+                    tex_to_color_map={"Opp.": TEAL_B, "Adj.": GREEN, "Hyp.": GOLD},
                     font_size=50
                 ).move_to(cosine_frac).shift([-0.2, -0.05, 0])
             ),
@@ -811,7 +811,7 @@ class Proportions(Scene):
                 tangent_frac, 
                 MathTex(
                     r"\frac{Opp.}{Adj.}", 
-                    tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
+                    tex_to_color_map={"Opp.": TEAL_B, "Adj.": GREEN, "Hyp.": GOLD},
                     font_size=50
                 ).move_to(tangent_frac).shift([-0.2, -0.05, 0])
             ),
@@ -838,7 +838,7 @@ class Proportions(Scene):
         self.wait()
 
         label_d.add_updater(
-            lambda mob: text_label(mob, line_a, (line_a, RIGHT), 0.3, "Opp.", TEAL)
+            lambda mob: text_label(mob, line_a, (line_a, RIGHT), 0.3, "Opp.", TEAL_B)
         )
         label_e.add_updater(
             lambda mob: text_label(mob, line_b, (line_b, DOWN), 0.3, "Adj.", GREEN)
@@ -873,7 +873,7 @@ class Proportions(Scene):
 
         tex_ratio = MathTex(
             r"\sin(50^\circ)=\frac{Opp.}{Hyp.}=",
-            tex_to_color_map={"Opp.": TEAL, "Adj.": GREEN, "Hyp.": GOLD},
+            tex_to_color_map={"Opp.": TEAL_B, "Adj.": GREEN, "Hyp.": GOLD},
             font_size=50
         ).next_to(box, LEFT, -4.9)
         tex_frac = MathTex(
@@ -892,7 +892,7 @@ class Proportions(Scene):
         self.play(
             Transform(
                 label_d,
-                MathTex(f"{line_a.get_length():.2f}", color=TEAL)
+                MathTex(f"{line_a.get_length():.2f}", color=TEAL_B)
                 .move_to(label_d)
                 .rotate(-PI/2)
             ),
@@ -921,7 +921,7 @@ class Proportions(Scene):
         )
 
         label_d.add_updater(
-            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, TEAL)
+            lambda mob: length_label(mob, line_a, (line_a, RIGHT), 0.3, TEAL_B)
         )
         label_e.add_updater(
             lambda mob: length_label(mob, line_b, (line_b, DOWN), 0.3, GREEN)
@@ -933,7 +933,7 @@ class Proportions(Scene):
 
         copy_d.add_updater(
             lambda mob: mob.become(
-                Tex(f"{line_a.get_length():.2f}", color=TEAL).move_to(
+                Tex(f"{line_a.get_length():.2f}", color=TEAL_B).move_to(
                     tex_frac.get_center() + [-1.2, 0.35, 0]
                 )
             )
