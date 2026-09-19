@@ -749,13 +749,13 @@ class Proportions(Scene):
         )
 
         self.play(
-            Transform(sine_ratio, MathTex(r"\sin(56^\circ) =").move_to(sine_ratio))
+            Transform(sine_ratio, MathTex(r"\sin(56^\circ) =", color=LIGHT_PINK).move_to(sine_ratio))
         )
         self.play(
-            Transform(cosine_ratio, MathTex(r"\cos(56^\circ) =").move_to(cosine_ratio))
+            Transform(cosine_ratio, MathTex(r"\cos(56^\circ) =", color=LIGHT_PINK).move_to(cosine_ratio))
         )
         self.play(
-            Transform(tangent_ratio, MathTex(r"\tan(56^\circ) =").move_to(tangent_ratio))
+            Transform(tangent_ratio, MathTex(r"\tan(56^\circ) =", color=LIGHT_PINK).move_to(tangent_ratio))
         )
 
         new_theta = MathTex(r"\theta", color=BLUE).next_to(angle_a, RIGHT, buff=0.1)
@@ -769,9 +769,9 @@ class Proportions(Scene):
         new_theta.add_updater(lambda mob: mob.next_to(angle_a, RIGHT, buff=0.1))
 
         self.play(
-            Transform(sine_ratio, MathTex(r"\sin \theta =").move_to(sine_ratio)),
-            Transform(cosine_ratio, MathTex(r"\cos \theta =").move_to(cosine_ratio)),
-            Transform(tangent_ratio, MathTex(r"\tan \theta =").move_to(tangent_ratio))
+            Transform(sine_ratio, MathTex(r"\sin \theta =", color=LIGHT_PINK).move_to(sine_ratio)),
+            Transform(cosine_ratio, MathTex(r"\cos \theta =", color=LIGHT_PINK).move_to(cosine_ratio)),
+            Transform(tangent_ratio, MathTex(r"\tan \theta =", color=LIGHT_PINK).move_to(tangent_ratio))
         )
         self.wait()
 
@@ -872,10 +872,17 @@ class Proportions(Scene):
         self.wait()
 
         tex_ratio = MathTex(
-            r"\sin(50^\circ)=\frac{Opp.}{Hyp.}=",
-            tex_to_color_map={"Opp.": TEAL_B, "Adj.": GREEN, "Hyp.": GOLD},
+            r"\sin(50^\circ)",
+            r"=",
+            r"\frac{\mathrm{Opp.}}{\mathrm{Hyp.}}=",
+            tex_to_color_map={
+                "Opp.": TEAL_B,
+                "Hyp.": GOLD,
+            },
             font_size=50
         ).next_to(box, LEFT, -4.9)
+        tex_ratio[0].set_color(LIGHT_PINK)
+        
         tex_frac = MathTex(
             rf"\frac{{0.00}}{{0.00}} = {math.sin(math.radians(50)):.5f}",
             color=BLUE_C,
