@@ -460,6 +460,11 @@ class Tangent(Scene):
             [-6, 6, 1],
             36, 36, faded_line_ratio=2
         ).shift([-3, 0, 0])
+        self.grid_cir = NumberPlane(
+            [-1.5, 1.5, 1], 
+            [-1.5, 1.5, 1],
+            4.5, 4.5, faded_line_ratio=2
+        ).move_to([-3, 0, 0]).set_z_index(-1)
         self.grid_coords = VGroup(
             Tex("1").move_to([3.3, 0.3, 0]),
             Tex("1").move_to([0.3, 3.3, 0]),
@@ -593,6 +598,8 @@ class Tangent(Scene):
         self.tan_tri_angles.scale(1/math.cos(self.theta.get_value()))
         self.tan_tri_angles.shift([0, -0.208, 0])
 
+        self.label_theta_a = self.label_a.copy().next_to(self.angle_a_smol, RIGHT, buff=0.1).clear_updaters()
+        self.label_theta_b = self.label_a.copy().next_to(self.angle_a_tan, RIGHT, buff=0.1).clear_updaters()
         self.label_adj_a = MathTex(r"Adj.", color=self.colours["adj"], font_size=40).next_to(self.smol_tri, DOWN, buff=0.2)
         self.label_adj_b = MathTex(r"1", color=self.colours["adj"], font_size=40).next_to(self.tan_tri, DOWN, buff=0.2)
         self.label_opp_a = MathTex(r"Opp.", color=self.colours["opp"], font_size=40).next_to(self.smol_tri, RIGHT, buff=0.1).shift([-1.1, -0.2, 0])
@@ -603,20 +610,22 @@ class Tangent(Scene):
             Create(self.angle_a_tan),
             Create(self.angle_c_smol),
             Create(self.angle_c_tan),
+            Write(self.label_a),
+            Write(self.label_theta_a),
+            Write(self.label_theta_b)
         )
         self.play(
             Indicate(self.angle_a_smol),
             Indicate(self.angle_a_tan),
             Indicate(self.angle_c_smol),
-            Indicate(self.angle_c_tan),
+            Indicate(self.angle_c_tan)
         )
         self.wait()
 
         self.play(
             Write(self.label_adj_a),
             Write(self.label_adj_b),
-            Write(self.label_opp_a),
-            Write(self.label_opp_b),
+            Write(self.label_opp_a)
         )
 
         self.play(
@@ -626,8 +635,19 @@ class Tangent(Scene):
             Transform(self.tan_formula[7], MathTex(r"\tan \theta", color=PURPLE).move_to(self.tan_formula[7]))
         )
         self.wait()
+        self.play(
+            Write(self.label_opp_b)
+        )
 
-        self.tan_label = MathTex(r"\tan \theta", color=PURPLE).rotate(PI/2)
+        self.sin_label = MathTex(r"\sin \theta", color=self.colours["opp"]).rotate(PI/2)
+        self.sin_label.add_updater(
+            lambda mob: mob.next_to(self.line_a, LEFT, buff=0.3)
+        )
+        self.cos_label = MathTex(r"\cos \theta", color=self.colours["adj"])
+        self.cos_label.add_updater(
+            lambda mob: mob.next_to(self.line_b, DOWN, buff=0.3)
+        )
+        self.tan_label = MathTex(r"\tan \theta", color=self.colours["tan"]).rotate(PI/2)
         self.tan_label.add_updater(
             lambda mob: mob.next_to(self.tangent_segment, RIGHT, buff=0.3)
         )
@@ -647,7 +667,68 @@ class Tangent(Scene):
             Unwrite(self.label_opp_a),
             Unwrite(self.label_opp_b),
             Unwrite(self.label_adj_a),
-            Unwrite(self.label_adj_b)
+            Unwrite(self.label_adj_b),
+            Unwrite(self.label_theta_a),
+            Unwrite(self.label_theta_b)
+        )
+        self.wait()
+
+        self.play(
+            self.line_a.animate.set_color(self.colours["opp"]).set_stroke_width(10),
+            self.line_b.animate.set_color(self.colours["adj"]).set_stroke_width(10),
+            Write(self.sin_label),
+            Write(self.cos_label)
+        )
+
+        self.play(self.theta.animate.set_value(6.2*PI), run_time=8, rate_func=smoothstep)
+        self.wait()
+
+        self.sin_label.clear_updaters()
+        self.cos_label.clear_updaters()
+        self.tan_label.clear_updaters()
+        for dot in self.dots:
+            dot.clear_updaters()
+        self.dot_d.clear_updaters()
+        self.tangent_segment.clear_updaters()
+        self.line_cc.clear_updaters()
+        self.label_c.clear_updaters()
+        self.label_a.clear_updaters()
+
+        toutlemonde = Group(
+            self.line_cc,
+            self.angle_a,
+            self.angle_c,
+            self.circle,
+            self.tangent_segment,
+            self.dots,
+            self.dot_d,
+            self.sin_label,
+            self.cos_label,
+            self.tan_label,
+            self.label_a,
+        ).set_z_index(10)
+        self.line_a.set_z_index(5)
+        self.line_b.set_z_index(5)
+
+        self.play(
+            Unwrite(self.label_f),
+            Unwrite(self.sin_label),
+            Unwrite(self.cos_label),
+            Unwrite(self.tan_label),
+            self.line_a.animate.set_stroke_width(5),
+            self.line_b.animate.set_stroke_width(5),
+            self.tangent_segment.animate.set_stroke_width(5),
+        )
+
+        self.play(
+            Transform(self.grid, self.grid_cir.set_z_index(-10)),
+            toutlemonde.animate.scale(0.5, about_point=[-3, 0, 0]),
+            ScaleInPlace(self.grid_coords, 0.5)
+        )
+        self.play(
+            self.grid.animate.shift([-1, 0, 0]),
+            toutlemonde.animate.shift([-1, 0, 0]),
+            self.grid_coords.animate.shift([-1, 0, 0])
         )
         self.wait()
 
@@ -663,7 +744,7 @@ class Tangent(Scene):
         # )
 
 
-class Graph(Scene):
+class Graphing(Scene):
     colours = {
         "hyp": GOLD,
         "opp": TEAL_B,
@@ -690,25 +771,56 @@ class Graph(Scene):
             math.atan(self.line_c.get_height()/self.line_c.get_width())
         )
         self.dots.scale(3/self.line_c.get_length())
+        self.grid_cir = NumberPlane(
+            [-1.5, 1.5, 1], 
+            [-1.5, 1.5, 1],
+            4.5, 4.5, faded_line_ratio=2
+        ).move_to([-4, 0, 0])
         self.grid = NumberPlane(
             [-6, 6, 1],
             [-6, 6, 1],
             36, 36, faded_line_ratio=2
-        ).shift([-3, 0, 0])
+        ).shift([-4, 0, 0])
+        self.axises = Axes(
+            [0, 10, PI/2], [-1, 1, 1], 
+            7.5, 3
+        ).shift([3, 0, 0])
+        self.axis_coords = VGroup()
+        for i in range(1, 7):
+            label = MathTex(str(i*90), r"^\circ").move_to(self.axises.coords_to_point(i * PI/2, -0.2)).scale(0.5)
+            self.axis_coords.add(label)
         self.grid_coords = VGroup(
             Tex("1").move_to([3.3, 0.3, 0]),
             Tex("1").move_to([0.3, 3.3, 0]),
             Tex("-1").move_to([-3.3, 0.3, 0]),
             Tex("-1").move_to([0.3, -3.3, 0])
-        ).shift([-3, 0, 0])
-        self.circle = Circle(3).move_to([-3, 0, 0])
+        ).shift([-4, 0, 0]).scale(0.5)
+        self.circle = Circle(1.5).move_to([-4, 0, 0])
         self.o_arm = Line(ORIGIN, 3*RIGHT)
-        self.cover = Rectangle(BLACK, 10, 10).set_fill(BLACK, 1).move_to([6, 0, 0]).set_opacity(0.5)
         self.line_cc = DashedLine(dash_length=0.2)
         self.dot_d = Dot([0, 3*math.tan(self.theta.get_value()), 0])
-        self.tangent_segment = Line([0, 0, 0], self.dot_d.get_center(), color=self.colours["tan"], stroke_width=10)
+        self.tangent_segment = Line([0, 0, 0], self.dot_d.get_center(), color=self.colours["tan"], stroke_width=5)
+        self.deg_display = MathTex(r"\theta =", str(round(math.degrees(self.theta.get_value()))), r"^\circ", color=BLUE)
 
-        self.dots[0].move_to([-3, 0, 0])
+        self.deg_display.add_updater(
+            lambda mob: mob.become(
+                MathTex(r"\theta =", str(round(math.degrees(self.theta.get_value()))), r"^\circ", color=BLUE)
+            ).move_to([-4, 3, 0])
+        )
+        self.sin_label = MathTex(r"\sin \theta", color=self.colours["opp"]).rotate(PI/2)
+        self.sin_label.add_updater(
+            lambda mob: mob.next_to(self.line_a, LEFT, buff=0.3)
+        )
+        self.cos_label = MathTex(r"\cos \theta", color=self.colours["adj"])
+        self.cos_label.add_updater(
+            lambda mob: mob.next_to(self.line_b, DOWN, buff=0.3)
+        )
+        self.tan_label = MathTex(r"\tan \theta", color=self.colours["tan"]).rotate(PI/2)
+        self.tan_label.add_updater(
+            lambda mob: mob.next_to(self.tangent_segment, RIGHT, buff=0.3)
+        )
+
+        self.dots[0].move_to([-4, 0, 0])
         print("Theta is", self.theta.get_value(), math.degrees(self.theta.get_value()), "degrees")
         print("Radius is", self.circle.radius)
         self.angle_a.clear_updaters()
@@ -732,20 +844,20 @@ class Graph(Scene):
         )
         
         self.dots[1].add_updater(lambda dot: 
-            theta_dot(dot, [-3, 0, 0], self.theta.get_value(), 3)
-        )
+            theta_dot(dot, [-4, 0, 0], self.theta.get_value(), 1.5)
+        ).scale(0.5)
         self.dots[2].add_updater(lambda dot: 
-            perpendicular_dot(dot, self.dots[1], [-3, 0, 0])
+            perpendicular_dot(dot, self.dots[1], [-4, 0, 0])
         )
         self.dot_d.add_updater(
-            lambda dot: tan_dot(dot, self.dots[1], self.theta.get_value(), [-3, 0, 0], 3)
+            lambda dot: tan_dot(dot, self.dots[1], self.theta.get_value(), [-4, 0, 0], 1.5)
         )
-        self.dot_d.set_z_index(10)
+        self.dot_d.set_z_index(10).scale(0.5)
         self.line_cc.add_updater(
-            lambda line: hyp_ext(line, self.dots[1], self.theta.get_value(), [-3, 0, 0])
+            lambda line: hyp_ext(line, self.dots[1], self.theta.get_value(), [-4, 0, 0], 0.1)
         )
         self.tangent_segment.add_updater(
-            lambda mob: mob.put_start_and_end_on([0, 0, 0], self.dot_d.get_center())
+            lambda mob: mob.put_start_and_end_on([-2.5, 0, 0], self.dot_d.get_center())
         )
         
         self.add(
@@ -758,17 +870,73 @@ class Graph(Scene):
             self.line_cc,
             self.angle_a, 
             self.angle_c,
-            self.label_f,
-            self.grid,
+            self.label_a,
+            self.grid_cir,
             self.grid_coords,
-            self.cover,
             self.circle,
-            self.tangent_segment
+            self.tangent_segment,
         )
-        self.label_f.set_opacity(1)
+        self.label_a.scale(0.5)
         self.dots[1].set_opacity(1).set_z_index(10)
+        self.line_a.set_z_index(2)
+        self.line_b.set_z_index(2)
         self.line_c.set_color(GOLD)
+        self.line_a.set_color(self.colours["opp"]).set_stroke_width(5),
+        self.line_b.set_color(self.colours["adj"]).set_stroke_width(5),
+        self.theta.set_value(0.2*PI)
+
+        self.update_mobjects(0)
+        self.wait()
+
+        self.play(
+            Create(self.axises),
+            Write(self.axis_coords)
+        )
+        self.line_cc.clear_updaters()
+        self.play(
+            Write(self.deg_display),
+            self.dot_d.animate.set_opacity(0),
+            self.tangent_segment.animate.set_opacity(0),
+            self.line_cc.animate.set_opacity(0)
+        )
+        self.play(
+            self.line_a.animate.set_stroke_width(10)
+        )
+        self.play(Indicate(self.line_a))
+        self.wait()
+
+        self.play(
+            self.theta.animate.set_value(0.0001)
+        )
+
+        start = self.axises.coords_to_point(0, 0)
+        self.end = Dot(start, 0.1)
+        self.connector = Line(self.dots[1].get_center(), start)
+        self.connector.add_updater(
+            lambda mob: mob.put_start_and_end_on(self.dots[1].get_center(), self.end.get_center())
+        )
+        self.end.add_updater(
+            lambda mob: mob.move_to(self.axises.coords_to_point(
+                self.theta.get_value(), math.sin(self.theta.get_value())
+            ))
+        )
         
+        self.sine = self.axises.plot(lambda x: math.sin(x), color=self.colours["opp"], x_range=[0, 10])
+
+        self.play(
+            Create(self.end),
+            Create(self.connector)
+        )
+
+        self.play(
+            self.theta.animate.set_value(10),
+            Create(self.sine),
+            run_time=9
+        )
+
+
+
+
 
 
 
@@ -810,7 +978,7 @@ def tan_dot(dot, target, angle, centre=[0, 0, 0], radius=1, maxi=10):
         [centre[0]+radius, centre[1]+tan, target_pos[2]]
     )
 
-def hyp_ext(line, dot, theta, centre=[0, 0, 0]):
+def hyp_ext(line, dot, theta, centre=[0, 0, 0], dash=0.2):
     dot_pos = dot.get_center()
     dx = dot_pos[0]-centre[0]
     dy = dot_pos[1]-centre[1]
@@ -819,17 +987,17 @@ def hyp_ext(line, dot, theta, centre=[0, 0, 0]):
     if math.cos(theta) >= 0:
         if dx > r * 0.5:
             tan_pos = [centre[0]+r, dy/dx*r, 0]
-            line.become(DashedLine(dot_pos, tan_pos, dash_length=0.2))
+            line.become(DashedLine(dot_pos, tan_pos, dash_length=dash))
         else:
             tan_pos = dir * 10 + centre
-            line.become(DashedLine(dot_pos, tan_pos, dash_length=0.2))
+            line.become(DashedLine(dot_pos, tan_pos, dash_length=dash))
     else:
         if dx < -r * 0.5:
             tan_pos = [centre[0]+r, dy/dx*r, 0]
-            line.become(DashedLine(centre, tan_pos, dash_length=0.2))
+            line.become(DashedLine(centre, tan_pos, dash_length=dash))
         else:
             tan_pos = dir * -10 + centre
-            line.become(DashedLine(centre, tan_pos, dash_length=0.2))
+            line.become(DashedLine(centre, tan_pos, dash_length=dash))
 
 
 def tangent_line(line, dot, centre=[0, 0, 0], len=20):
