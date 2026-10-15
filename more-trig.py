@@ -596,7 +596,7 @@ class Tangent(Scene):
         ).clear_updaters()
         self.tan_tri_angles = Group(self.angle_a_tan, self.angle_c_tan)
         self.tan_tri_angles.scale(1/math.cos(self.theta.get_value()))
-        self.tan_tri_angles.shift([0, -0.208, 0])
+        self.tan_tri.shift([0, 0.208, 0])
 
         self.label_theta_a = self.label_a.copy().next_to(self.angle_a_smol, RIGHT, buff=0.1).clear_updaters()
         self.label_theta_b = self.label_a.copy().next_to(self.angle_a_tan, RIGHT, buff=0.1).clear_updaters()
@@ -800,6 +800,7 @@ class Graphing(Scene):
         self.line_cc = DashedLine(dash_length=0.2)
         self.dot_d = Dot([0, 3*math.tan(self.theta.get_value()), 0])
         self.tangent_segment = Line([0, 0, 0], self.dot_d.get_center(), color=self.colours["tan"], stroke_width=5)
+        self.func_display = MathTex(r"\sin \theta", color=self.colours["opp"]).move_to(self.axises.get_center()+[0, 3, 0])
         self.deg_display = MathTex(r"\theta =", str(round(math.degrees(self.theta.get_value()))), r"^\circ", color=BLUE)
 
         self.deg_display.add_updater(
@@ -922,17 +923,58 @@ class Graphing(Scene):
         )
         
         self.sine = self.axises.plot(lambda x: math.sin(x), color=self.colours["opp"], x_range=[0, 10])
+        self.cosine = self.axises.plot(lambda x: math.cos(x), color=self.colours["adj"], x_range=[0, 10])
 
         self.play(
             Create(self.end),
-            Create(self.connector)
+            Create(self.connector),
+            Write(self.func_display)
         )
 
         self.play(
             self.theta.animate.set_value(10),
             Create(self.sine),
-            run_time=9
+            run_time=12
         )
+        self.wait()
+        self.play(
+            self.theta.animate.set_value(0.0001),
+            Uncreate(self.sine),
+            run_time=5
+        )
+
+        self.end.clear_updaters()
+        self.play(
+            Uncreate(self.connector),
+            self.end.animate.move_to(self.axises.coords_to_point(0, 1))
+        )
+        self.play(
+            self.line_b.animate.set_stroke_width(10),
+            self.line_a.animate.set_stroke_width(5),
+            Transform(
+                self.func_display, 
+                MathTex(r"\cos \theta", color=self.colours["adj"]).move_to(self.axises.get_center()+[0, 3, 0])
+            )
+        )
+        self.play(Indicate(self.line_b))
+        self.wait()
+        self.end.add_updater(
+            lambda mob: mob.move_to(self.axises.coords_to_point(
+                self.theta.get_value(), math.cos(self.theta.get_value())
+            ))
+        )
+        self.play(
+            self.theta.animate.set_value(10),
+            Create(self.cosine),
+            run_time=12
+        )
+        self.wait()
+        self.play(
+            self.theta.animate.set_value(0.0001),
+            Uncreate(self.cosine),
+            run_time=5
+        )
+
 
 
 
