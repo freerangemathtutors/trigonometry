@@ -580,7 +580,7 @@ class Tangent(Scene):
         self.play(self.smol_tri.animate.move_to([2, -1, 0]))
         self.play(FadeIn(self.tan_tri))
         self.play(Indicate(self.tan_tri))
-        self.play(self.tan_tri.animate.move_to([5, -1, 0]))
+        self.play(self.tan_tri.animate.move_to([5, -1+0.208, 0]))
 
         self.angle_a_smol = self.angle_a.copy().shift(
             self.smol_tri.get_center()-self.big_tri.get_center()
@@ -595,8 +595,7 @@ class Tangent(Scene):
             self.tan_tri.get_center()-self.big_tri.get_center()
         ).clear_updaters()
         self.tan_tri_angles = Group(self.angle_a_tan, self.angle_c_tan)
-        self.tan_tri_angles.scale(1/math.cos(self.theta.get_value()))
-        self.tan_tri.shift([0, 0.208, 0])
+        self.tan_tri_angles.scale(1/math.cos(self.theta.get_value())).shift([0, -0.208, 0])
 
         self.label_theta_a = self.label_a.copy().next_to(self.angle_a_smol, RIGHT, buff=0.1).clear_updaters()
         self.label_theta_b = self.label_a.copy().next_to(self.angle_a_tan, RIGHT, buff=0.1).clear_updaters()
@@ -780,7 +779,7 @@ class Graphing(Scene):
             [-6, 6, 1],
             [-6, 6, 1],
             36, 36, faded_line_ratio=2
-        ).shift([-4, 0, 0])
+        )
         self.axises = Axes(
             [0, 10, PI/2], [-1, 1, 1], 
             7.5, 3
@@ -945,7 +944,7 @@ class Graphing(Scene):
 
         self.end.clear_updaters()
         self.play(
-            Uncreate(self.connector),
+            self.connector.animate.set_opacity(0),
             self.end.animate.move_to(self.axises.coords_to_point(0, 1))
         )
         self.play(
@@ -974,8 +973,206 @@ class Graphing(Scene):
             Uncreate(self.cosine),
             run_time=5
         )
+        self.wait()
 
+        # Thanks Adenosie for the inspo!
+        self.tangent = VGroup(color=self.colours["tan"])
+        self.tangent.set_points_as_corners(
+            (self.axises.coords_to_point(0, 0), self.axises.coords_to_point(-0.0001, 0))
+        )
+        def update_tangent(func):
+            next_point = self.axises.coords_to_point([
+                self.theta.get_value(),
+                np.tan(self.theta.get_value())
+            ])
+            if next_point[1] < func.get_last_point()[1]:
+                func.start_new_path(next_point)
+            else:
+                func.add_line_to(next_point)
+        self.va = VGroup(
+            DashedLine(self.axises.coords_to_point((n+0.5)*PI, 10), self.axises.coords_to_point((n+0.5)*PI, -10))
+            for n in range(3)
+        )
 
+        self.end.clear_updaters()
+        self.play(
+            self.dot_d.animate.set_opacity(1),
+            self.tangent_segment.animate.set_opacity(1).set_stroke_width(10),
+            self.line_b.animate.set_stroke_width(5),
+            self.line_b.animate.set_stroke_width(5),
+            self.end.animate.move_to(self.axises.coords_to_point(0, 0)),
+            Transform(
+                self.func_display, 
+                MathTex(r"\tan \theta", color=self.colours["tan"]).move_to(self.axises.get_center()+[0, 3, 0])
+            )
+        )
+        self.line_cc.add_updater(
+            lambda line: hyp_ext(line, self.dots[1], self.theta.get_value(), [-4, 0, 0], 0.1)
+        )
+        self.connector.clear_updaters()
+        self.connector.add_updater(
+            lambda mob: mob.put_start_and_end_on(self.dot_d.get_center(), self.end.get_center())
+        )
+        self.play(self.line_cc.animate.set_opacity(1))
+        self.play(self.theta.animate.set_value(PI/4))
+        self.play(Indicate(self.tangent_segment))
+        self.play(self.theta.animate.set_value(0.0001))
+        self.wait()
+        self.play(self.connector.animate.set_opacity(1))
+        self.end.add_updater(
+            lambda mob: mob.move_to([
+                self.axises.coords_to_point(self.theta.get_value())[0], 
+                self.dot_d.get_center()[1], 0
+        ]))
+        self.tangent.add_updater(lambda mob: update_tangent(mob))
+        self.add(self.tangent)
+        self.play(
+            self.theta.animate.set_value(10),
+            run_time=12
+        )
+        self.tangent.clear_updaters()
+        self.wait()
+        self.play(
+            FadeOut(self.tangent),
+            self.theta.animate.set_value(0.0001),
+            run_time=2
+        )
+        self.tangent.reset_points()
+        self.tangent.set_points_as_corners(
+            (self.axises.coords_to_point(0, 0), self.axises.coords_to_point(-0.0001, 0))
+        )
+        self.tangent.add_updater(lambda mob: update_tangent(mob))
+        self.add(self.tangent)
+        self.play(
+            self.theta.animate.set_value(PI/2-0.0001),
+            run_time=2
+        )
+        self.wait()
+        self.line_cc.suspend_updating()
+        self.play(
+            Indicate(self.line_cc),
+            Indicate(self.tangent_segment),
+            run_time=2
+        )
+        self.line_cc.resume_updating()
+        self.wait()
+        self.play(
+            self.theta.animate.set_value(PI-0.0001),
+            run_time=2
+        )
+        self.wait()
+        self.play(
+            self.theta.animate.set_value(10),
+            Create(self.va),
+            run_time=4
+        )
+        self.play(
+            Indicate(self.va[0]),
+            Indicate(self.va[1]),
+            Indicate(self.va[2])
+        )
+        self.wait()
+
+        self.play(
+            Uncreate(self.tangent),
+            Uncreate(self.axises),
+            Uncreate(self.connector),
+            Uncreate(self.end),
+            Unwrite(self.axis_coords),
+            Uncreate(self.deg_display),
+            Uncreate(self.func_display),
+            Uncreate(self.va)
+        )
+        self.play(
+            self.theta.animate.set_value(PI*1/5),
+            run_time=3
+        )
+        self.line_cc.clear_updaters()
+        self.dot_d.clear_updaters()
+        self.tangent_segment.clear_updaters()
+        self.dots[1].clear_updaters()
+        self.dots[2].clear_updaters()
+        self.wait()
+
+        self.play(
+            self.dots.animate.shift([4, 0, 0]),
+            self.grid_cir.animate.shift([4, 0, 0]),
+            self.circle.animate.shift([4, 0, 0]),
+            self.grid_coords.animate.shift([4, 0, 0]),
+            self.dot_d.animate.shift([4, 0, 0]),
+            self.line_cc.animate.shift([4, 0, 0]),
+            self.tangent_segment.animate.shift([4, 0, 0])
+        )
+        toutlemonde = Group(
+            self.line_cc,
+            self.angle_a,
+            self.angle_c,
+            self.circle,
+            self.tangent_segment,
+            self.dots,
+            self.dot_d,
+            self.label_a,
+        ).set_z_index(10)
+        self.line_a.set_z_index(5)
+        self.line_b.set_z_index(5)
+        self.play(
+            Transform(self.grid_cir, self.grid.set_z_index(-10)),
+            toutlemonde.animate.scale(2, about_point=[0, 0, 0]),
+            ScaleInPlace(self.grid_coords, 2)
+        )
+        self.play(
+            Write(self.sin_label),
+            Write(self.cos_label),
+            Write(self.tan_label),
+            Write(self.label_f),
+            self.line_a.animate.set_stroke_width(10),
+            self.line_b.animate.set_stroke_width(10),
+            self.tangent_segment.animate.set_stroke_width(10)
+        )
+        self.wait()
+
+        self.line_b.clear_updaters()
+        self.tan_label.clear_updaters()
+        self.cos_label.clear_updaters()
+        temp_d_spot = [1/math.cos(self.theta.get_value())*3, 0, 0]
+        self.play(
+            self.big_tri.animate.set_opacity(0),
+            self.tan_label.animate.rotate(-PI/2).move_to([3.9879, 1.1462, 0]),
+            self.cos_label.animate.move_to([1.2135, 2.2417, 0]),
+            FadeOut(self.line_cc),
+            Uncreate(self.angle_c),
+            self.dot_d.animate.move_to(temp_d_spot),
+            self.tangent_segment.animate.put_start_and_end_on(temp_d_spot, self.dots[1].get_center()),
+            self.line_b.animate.put_start_and_end_on([0, math.sin(self.theta.get_value())*3, 0], self.dots[1].get_center()),
+            run_time=3
+        )
+        self.dots[1].add_updater(lambda dot: 
+            theta_dot(dot, [0, 0, 0], self.theta.get_value(), 3)
+        )
+        self.dots[2].add_updater(lambda dot: 
+            perpendicular_dot(dot, self.dots[1], [0, 0, 0])
+        )
+        self.dot_d.add_updater(lambda mob: tan_dot(
+            mob, self.dots[1], self.theta.get_value(), radius=3, axis="x"
+        ))
+        self.tan_label.add_updater(lambda mob: mob.move_to(self.tangent_segment.get_center()).shift(
+            mob.get_center() * 0.3
+        ))
+        self.cos_label.add_updater(lambda mob: mob.next_to(self.line_b, UP, buff=0.3))
+        self.tangent_segment.add_updater(lambda mob: tan_ext(mob, self.dots[1], self.theta.get_value()))
+        self.line_b.add_updater(lambda mob: mob.put_start_and_end_on(
+            [0, math.sin(self.theta.get_value())*3, 0], 
+            self.dots[1].get_center()
+        ))
+        self.wait()
+        self.update_mobjects(0)
+        print(self.tan_label.get_center())
+        print(self.cos_label.get_center())
+        self.play(
+            self.theta.animate.set_value(PI*13/4),
+            run_time=15
+        )
+        self.wait()
 
 
 
@@ -1010,15 +1207,43 @@ def perpendicular_dot(dot, target, centre=[0, 0, 0]):
         [target_pos[0], target_pos[1]+sine, target_pos[2]]
     )
 
-def tan_dot(dot, target, angle, centre=[0, 0, 0], radius=1, maxi=10):
-    target_pos = target.get_center()
-    tan = min(
-        radius * math.tan(angle),
-        maxi
-    )
-    dot.move_to(
-        [centre[0]+radius, centre[1]+tan, target_pos[2]]
-    )
+def tan_dot(dot, target, angle, centre=[0, 0, 0], radius=1, maxi=10, axis="y"):
+    if axis != "x":
+        tan = min(
+            radius * math.tan(angle),
+            maxi
+        )
+        dot.move_to(
+            [centre[0]+radius, centre[1]+tan, 0]
+        )
+    else:
+        sec = min(
+            radius * 1/math.cos(angle),
+            maxi
+        )
+        dot.move_to(
+            [centre[0]+sec, centre[1], 0]
+        )
+
+def tan_ext(line, dot, theta, centre=[0, 0, 0]):
+    dot_pos = dot.get_center()
+    dx = dot_pos[0]-centre[0]
+    dy = dot_pos[1]-centre[1]
+    r = np.linalg.norm(dot_pos-centre)
+    print("r="+str(r), "dx="+str(dx))
+
+    if abs(dx) > r * 0.2:
+        tan_pos = [centre[0]+r/math.cos(theta), centre[1], 0]
+        line.put_start_and_end_on(dot_pos, tan_pos)
+    else:
+        dir = (dot_pos - centre) / r
+        if math.tan(theta) >= 0:
+            dir = np.array([dir[1], -dir[0], 0])
+        else:
+            dir = np.array([-dir[1], dir[0], 0])
+        tan_pos = dir * 10 + dot_pos
+        print("dir", str(dir), "tanpos", str(tan_pos))
+        line.put_start_and_end_on(dot_pos, tan_pos)
 
 def hyp_ext(line, dot, theta, centre=[0, 0, 0], dash=0.2):
     dot_pos = dot.get_center()
@@ -1027,14 +1252,14 @@ def hyp_ext(line, dot, theta, centre=[0, 0, 0], dash=0.2):
     r = np.linalg.norm(dot_pos-centre)
     dir = (dot_pos - centre) / r
     if math.cos(theta) >= 0:
-        if dx > r * 0.5:
+        if dx > r * 0.2:
             tan_pos = [centre[0]+r, dy/dx*r, 0]
             line.become(DashedLine(dot_pos, tan_pos, dash_length=dash))
         else:
             tan_pos = dir * 10 + centre
             line.become(DashedLine(dot_pos, tan_pos, dash_length=dash))
     else:
-        if dx < -r * 0.5:
+        if dx < -r * 0.2:
             tan_pos = [centre[0]+r, dy/dx*r, 0]
             line.become(DashedLine(centre, tan_pos, dash_length=dash))
         else:
