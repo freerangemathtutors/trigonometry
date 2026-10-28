@@ -1196,6 +1196,8 @@ class Reciprocals(Scene):
         "adj": GREEN,
         "tan": PURPLE,
         "cot": PURPLE_A,
+        "sec": MAROON,
+        "csc": MAROON_A,
         "tri_out": WHITE,
         "tri_in": BLUE,
         "tri_in_op": 0.3,
@@ -1206,7 +1208,19 @@ class Reciprocals(Scene):
             "Opp.": TEAL_B, 
             "Adj.": GREEN, 
             "Hyp.": GOLD, 
-            "1": GOLD
+            "1": GOLD,
+            r"\sin": TEAL_B,
+            r"\cos": GREEN,
+            r"\tan": PURPLE,
+            r"\sec": MAROON,
+            r"\csc": MAROON_A,
+            r"\cot": PURPLE_A,
+            r"\sin \theta": TEAL_B,
+            r"\cos \theta": GREEN,
+            r"\tan \theta": PURPLE,
+            r"\sec \theta": MAROON,
+            r"\csc \theta": MAROON_A,
+            r"\cot \theta": PURPLE_A
         }
     }
 
@@ -1241,7 +1255,9 @@ class Reciprocals(Scene):
         )
         self.circle = Circle(3)
         self.o_arm = Line(ORIGIN, 3*RIGHT)
+        self.cover = Rectangle(BLACK, 10, 10).set_fill(BLACK, 1).set_opacity(0.5).move_to([-15, 0, 0])
         self.line_cc = DashedLine(dash_length=0.2)
+        self.dot_o = Dot([0, 0, 0])
         self.dot_d = Dot([0, 3*math.tan(self.theta.get_value()), 0])
         self.dot_e = Dot([0, 3/math.tan(self.theta.get_value()), 0])
         self.func_display = MathTex(r"\sin \theta", color=self.colours["opp"]).move_to(self.axises.get_center()+[0, 3, 0])
@@ -1287,6 +1303,14 @@ class Reciprocals(Scene):
         self.cot_segment.add_updater(
             lambda mob: cot_ext(mob, self.dots[1], self.theta.get_value())
         )
+        self.sec_segment = Line([0, 0, 0], self.dot_d.get_center(), color=self.colours["sec"], stroke_width=5)
+        self.sec_segment.add_updater(
+            lambda mob: mob.put_start_and_end_on([0, 0, 0], self.dot_d.get_center())
+        )
+        self.csc_segment = Line([0, 0, 0], self.dot_d.get_center(), color=self.colours["csc"], stroke_width=5)
+        self.csc_segment.add_updater(
+            lambda mob: mob.put_start_and_end_on([0, 0, 0], self.dot_e.get_center())
+        )
         self.line_b.clear_updaters()
         self.line_b.add_updater(lambda mob: mob.put_start_and_end_on(
             [0, math.sin(self.theta.get_value())*3, 0], 
@@ -1310,6 +1334,20 @@ class Reciprocals(Scene):
         self.tan_label.add_updater(lambda mob: mob.move_to(
             self.tangent_segment.get_center()).shift(mob.get_center() * 0.3)
         )
+        self.cot_label = MathTex(r"\cot \theta", color=self.colours["cot"])
+        self.cot_label.add_updater(lambda mob: mob.move_to(
+            self.cot_segment.get_center()).shift(mob.get_center() * np.array([0.7, 0.1, 0]))
+        )
+        self.sec_label = MathTex(r"\sec \theta", color=self.colours["sec"])
+        self.sec_label.add_updater(
+            lambda mob: mob.next_to(self.sec_segment, DOWN, buff=0.3)
+        )
+        self.csc_label = MathTex(r"\csc \theta", color=self.colours["csc"]).rotate(PI/2)
+        self.csc_label.add_updater(
+            lambda mob: mob.next_to(self.csc_segment, LEFT, buff=0.3)
+        )
+        self.label_f.add_updater(lambda mob: normal_pos(mob, self.line_c, 0.3))
+
 
         self.add(
             self.dots,
@@ -1326,23 +1364,156 @@ class Reciprocals(Scene):
             self.line_a,
             self.line_b,
             self.tangent_segment,
-            self.cot_segment,
             self.dot_d,
-            self.dot_e
         )
         self.dots[0].move_to([0, 0, 0])
         self.dots[1].set_opacity(1).set_z_index(10)
+        self.dot_o.set_z_index(10)
+        self.dot_d.set_z_index(10)
+        self.dot_e.set_z_index(10)
         self.big_tri.set_stroke_width(0)
+        self.label_f.set_opacity(1)
         self.line_c.set_color(GOLD)
         self.line_a.set_color(self.colours["opp"]).set_stroke_width(10)
         self.line_b.set_color(self.colours["adj"]).set_stroke_width(10)
         self.tangent_segment.set_stroke_width(10)
         self.cot_segment.set_stroke_width(10)
+        self.sec_segment.set_stroke_width(10)
+        self.csc_segment.set_stroke_width(10)
 
         self.update_mobjects(0)
-        self.play(self.theta.animate.set_value(PI/4+0.001))
+        self.play(Create(self.dot_o), self.theta.animate.set_value(PI/4+0.001))
 
-        self.play(self.theta.animate.set_value(9/4*PI), run_time=5)
+        self.play(self.theta.animate.set_value(9/4*PI), run_time=7)
+
+        self.play(
+            Create(self.cot_segment),
+            Create(self.dot_e),
+            Write(self.cot_label)
+        )
+        self.wait()
+        self.play(
+            Create(self.sec_segment),
+            Write(self.sec_label),
+        )
+        self.wait()
+        self.play(
+            Create(self.csc_segment),
+            Write(self.csc_label)
+        )
+        self.wait()
+
+        self.play(self.theta.animate.set_value(4.3*PI), run_time=15)
+
+        self.cos_label.clear_updaters().move_to([0.882, 2.905, 0])
+        self.play(self.cos_label.animate.shift([0, -0.6-self.cos_label.height, 0]))
+        self.cos_label.add_updater(
+            lambda mob: mob.next_to(self.line_b, DOWN, buff=0.3)
+        )
+
+        self.play(
+            self.cover.animate.move_to([-8, 0, 0])
+        )
+
+        # wheel = Group()
+        # for mob in self.mobjects:
+        #     mob.suspend_updating()
+        #     wheel.add(mob)
+        # toutlemonde = wheel.copy().clear_updaters()
+        # for mob in wheel:
+        #     self.remove(mob)
+        # self.add(toutlemonde)
+        # toutlemonde[7].move_to([1.285, 1.214, 0])
+        # toutlemonde[8].move_to([0.882, 2.905, 0])
+        # self.play(toutlemonde[8].animate.shift(np.array([0, -0.6-toutlemonde[8].height, 0])))
+
+
+        # self.add(self.cover)
+        # self.cover.set_z_index(11)
+        # self.play(
+        #     self.cover.animate.move_to([8, 0, 0]),
+        #     toutlemonde.animate.shift([-3, 0, 0]),
+        # )
+        self.tan_angle = RightAngle(self.line_c, self.tangent_segment, 0.2, quadrant=(-1, 1))
+
+        self.wait()
+        self.play(Create(self.tan_angle), Write(self.label_f))
+
+        self.sec_formula = MathTex(
+            r"\frac{",
+            r"\mathrm{Hyp.}",
+            r"}{",
+            r"\mathrm{Adj.}",
+            r"}",
+            r"=",
+            r"\sec \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, 1, 0])
+        self.sec_proof = MathTex(
+            r"\frac{",
+            r"1",
+            r"}{",
+            r"\cos \theta",
+            r"}",
+            r"="
+            r"\frac{",
+            r"\sec \theta",
+            r"}{",
+            r"1",
+            r"}",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, -1, 0])
+
+        self.play(
+            Write(self.sec_formula)
+        )
+        self.wait()
+        self.play(
+            Write(self.sec_proof[2]),
+            Write(self.sec_proof[5]),
+            Write(self.sec_proof[7]),
+        )
+        self.wait()
+        self.line_c.suspend_updating()
+        self.play(
+            Write(self.sec_proof[1]),
+            Indicate(self.line_c),
+            run_time=2
+        )
+        self.wait()
+        self.sin_label.suspend_updating()
+        self.line_a.suspend_updating()
+        self.play(
+            Write(self.sec_proof[3]),
+            Indicate(self.cos_label),
+            Indicate(self.line_b),
+            run_time=2
+        )
+        self.wait()
+        self.sec_label.suspend_updating()
+        self.sec_segment.suspend_updating()
+        self.play(
+            Write(self.sec_proof[6]),
+            Indicate(self.sec_label),
+            Indicate(self.sec_segment),
+            run_time=2
+        )
+        self.wait()
+        self.line_c.suspend_updating()
+        self.play(
+            Write(self.sec_proof[8]),
+            Indicate(self.line_c),
+            run_time=2
+        )
+        self.wait()
+
+
+
+
+
+        
 
         
         
