@@ -427,7 +427,6 @@ class Unitcircle(Scene):
         )
 
 
-
 class Tangent(Scene):
     colours = {
         "hyp": GOLD,
@@ -1188,7 +1187,6 @@ class Graphing(Scene):
         self.wait()
 
 
-
 class Reciprocals(Scene):
     colours = {
         "hyp": GOLD,
@@ -1348,6 +1346,72 @@ class Reciprocals(Scene):
         )
         self.label_f.add_updater(lambda mob: normal_pos(mob, self.line_c, 0.3))
 
+        self.sin_formula = MathTex(
+            r"\frac{",
+            r"\mathrm{Opp.}",
+            r"}{",
+            r"\mathrm{Hyp.}",
+            r"}",
+            r"=",
+            r"\sin \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, 0, 0])
+        self.cos_formula = MathTex(
+            r"\frac{",
+            r"\mathrm{Adj.}",
+            r"}{",
+            r"\mathrm{Hyp.}",
+            r"}",
+            r"=",
+            r"\cos \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, 2, 0])
+        self.tan_formula = MathTex(
+            r"\frac{",
+            r"\mathrm{Opp.}",
+            r"}{",
+            r"\mathrm{Adj.}",
+            r"}",
+            r"=",
+            r"\tan \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, -2, 0])
+        self.sec_formula = MathTex(
+            r"\frac{",
+            r"\mathrm{Hyp.}",
+            r"}{",
+            r"\mathrm{Adj.}",
+            r"}",
+            r"=",
+            r"\sec \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, 2, 0])
+        self.csc_formula = MathTex(
+            r"\frac{",
+            r"\mathrm{Hyp.}",
+            r"}{",
+            r"\mathrm{Opp.}",
+            r"}",
+            r"=",
+            r"\csc \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, 0, 0])
+        self.cot_formula = MathTex(
+            r"\frac{",
+            r"\mathrm{Adj.}",
+            r"}{",
+            r"\mathrm{Opp.}",
+            r"}",
+            r"=",
+            r"\cot \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, -2, 0])
 
         self.add(
             self.dots,
@@ -1385,23 +1449,46 @@ class Reciprocals(Scene):
         self.play(Create(self.dot_o), self.theta.animate.set_value(PI/4+0.001))
 
         self.play(self.theta.animate.set_value(9/4*PI), run_time=7)
+        self.play(self.cover.animate.move_to([-8, 0, 0]))
+
+        self.play(
+            Write(self.cos_formula),
+            Write(self.sin_formula),
+            Write(self.tan_formula)
+        )
+        self.wait()
 
         self.play(
             Create(self.cot_segment),
             Create(self.dot_e),
-            Write(self.cot_label)
+            Write(self.cot_label),
+            TransformMatchingTex(self.tan_formula, self.cot_formula),
+            run_time=2
         )
+        self.play(Indicate(self.cot_formula))
         self.wait()
         self.play(
             Create(self.sec_segment),
             Write(self.sec_label),
+            TransformMatchingTex(self.cos_formula, self.sec_formula),
+            run_time=2
         )
+        self.play(Indicate(self.sec_formula))
         self.wait()
         self.play(
             Create(self.csc_segment),
-            Write(self.csc_label)
+            Write(self.csc_label),
+            TransformMatchingTex(self.sin_formula, self.csc_formula),
+            run_time=2
         )
-        self.wait()
+        self.play(Indicate(self.csc_formula))
+        self.wait(2)
+        self.play(
+            self.cover.animate.move_to([-15, 0, 0]),
+            Unwrite(self.sec_formula),
+            Unwrite(self.csc_formula),
+            Unwrite(self.cot_formula)
+        )
 
         self.play(self.theta.animate.set_value(4.3*PI), run_time=15)
 
@@ -1437,31 +1524,52 @@ class Reciprocals(Scene):
         self.tan_angle = RightAngle(self.line_c, self.tangent_segment, 0.2, quadrant=(-1, 1))
 
         self.wait()
-        self.play(Create(self.tan_angle), Write(self.label_f))
-
+        self.play(
+            Create(self.tan_angle), 
+            Write(self.label_f),
+            self.cos_label.animate.set_z_index(5),
+            self.sin_label.animate.set_z_index(5)
+        )
+        #Redefine to fix geometry after uncreate
         self.sec_formula = MathTex(
-            r"\frac{",
-            r"\mathrm{Hyp.}",
-            r"}{",
-            r"\mathrm{Adj.}",
-            r"}",
+            r"\frac{", r"\mathrm{Hyp.}", r"}{", r"\mathrm{Adj.}", r"}",
             r"=",
             r"\sec \theta",
             tex_to_color_map=self.colours["colour_map"],
             font_size=50
         ).move_to([-5, 1, 0])
+        self.csc_formula = MathTex(
+            r"\frac{", r"\mathrm{Hyp.}", r"}{", r"\mathrm{Opp.}", r"}",
+            r"=",
+            r"\csc \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, 1, 0])
+        self.cot_formula = MathTex(
+            r"\frac{", r"\mathrm{Adj.}", r"}{", r"\mathrm{Opp.}", r"}",
+            r"=",
+            r"\cot \theta",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, 1, 0])
         self.sec_proof = MathTex(
-            r"\frac{",
-            r"1",
-            r"}{",
-            r"\cos \theta",
-            r"}",
+            r"\frac{", r"1", r"}{", r"\cos \theta", r"}",
             r"="
-            r"\frac{",
-            r"\sec \theta",
-            r"}{",
-            r"1",
-            r"}",
+            r"\frac{", r"\sec \theta", r"}{", r"1", r"}",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, -1, 0])
+        self.csc_proof = MathTex(
+            r"\frac{", r"1", r"}{", r"\sin \theta", r"}",
+            r"="
+            r"\frac{", r"\csc \theta", r"}{", r"1", r"}",
+            tex_to_color_map=self.colours["colour_map"],
+            font_size=50
+        ).move_to([-5, -1, 0])
+        self.cot_proof = MathTex(
+            r"\frac{", r"1", r"}{", r"\tan \theta", r"}",
+            r"="
+            r"\frac{", r"\cot \theta", r"}{", r"1", r"}",
             tex_to_color_map=self.colours["colour_map"],
             font_size=50
         ).move_to([-5, -1, 0])
@@ -1480,18 +1588,18 @@ class Reciprocals(Scene):
         self.play(
             Write(self.sec_proof[1]),
             Indicate(self.line_c),
-            run_time=2
+            run_time=1.5
         )
-        self.wait()
+        self.wait(0.5)
         self.sin_label.suspend_updating()
         self.line_a.suspend_updating()
         self.play(
             Write(self.sec_proof[3]),
             Indicate(self.cos_label),
             Indicate(self.line_b),
-            run_time=2
+            run_time=1.5
         )
-        self.wait()
+        self.wait(0.5)
         self.sec_label.suspend_updating()
         self.sec_segment.suspend_updating()
         self.play(
@@ -1500,23 +1608,173 @@ class Reciprocals(Scene):
             Indicate(self.sec_segment),
             run_time=2
         )
-        self.wait()
+        self.wait(0.5)
         self.line_c.suspend_updating()
         self.play(
             Write(self.sec_proof[8]),
             Indicate(self.line_c),
+            run_time=1.5
+        )
+        self.wait(0.5)
+
+        tri_a = Polygon(
+            [0, math.sin(self.theta.get_value())*3, 0], 
+            self.dots[1].get_center(),
+            [0, 0, 0],
+            color=self.colours["adj"], stroke_width=10
+        )
+        tri_b = Polygon(
+            self.dots[1].get_center(),
+            self.dot_d.get_center(),
+            [0, 0, 0],
+            color=self.colours["sec"], stroke_width=10
+        )
+        self.play(
+            Indicate(tri_a),
+            Indicate(self.sec_proof[0]),
+            Indicate(self.sec_proof[2]),
+            Indicate(self.sec_proof[3]),
+            run_time=2
+        )
+        self.play(
+            Indicate(tri_b),
+            Indicate(self.sec_proof[6]),
+            Indicate(self.sec_proof[7]),
+            Indicate(self.sec_proof[8]),
+            Indicate(self.sec_proof[9]),
             run_time=2
         )
         self.wait()
-
-
-
-
-
+        self.play(
+            tri_a.animate.set_opacity(0),
+            tri_b.animate.set_opacity(0),
+            Unwrite(self.sec_formula),
+            Unwrite(self.sec_proof)
+        )
         
+        tri_a = Polygon( 
+            self.dots[1].get_center(),
+            self.dots[2].get_center(),
+            [0, 0, 0],
+            color=self.colours["opp"], stroke_width=10
+        )
+        tri_b = Polygon(
+            self.dots[1].get_center(),
+            self.dot_e.get_center(),
+            [0, 0, 0],
+            color=self.colours["csc"], stroke_width=10
+        )
+        self.play(
+            Write(self.csc_formula),
+            Write(self.csc_proof)
+        )
+        self.play(
+            Indicate(tri_a),
+            Indicate(self.csc_proof[0]),
+            Indicate(self.csc_proof[2]),
+            Indicate(self.csc_proof[3]),
+            run_time=2
+        )
+        self.play(
+            Indicate(tri_b),
+            Indicate(self.csc_proof[6]),
+            Indicate(self.csc_proof[7]),
+            Indicate(self.csc_proof[8]),
+            Indicate(self.csc_proof[9]),
+            run_time=2
+        )
+        self.wait()
+        self.play(
+            tri_a.animate.set_opacity(0),
+            tri_b.animate.set_opacity(0),
+            Unwrite(self.csc_formula),
+            Unwrite(self.csc_proof)
+        )
+        
+        tri_a = Polygon( 
+            self.dots[1].get_center(),
+            self.dot_d.get_center(),
+            [0, 0, 0],
+            color=self.colours["tan"], stroke_width=10
+        )
+        tri_b = Polygon(
+            self.dots[1].get_center(),
+            self.dot_e.get_center(),
+            [0, 0, 0],
+            color=self.colours["cot"], stroke_width=10
+        )
+        self.play(
+            Write(self.cot_formula),
+            Write(self.cot_proof)
+        )
+        self.play(
+            Indicate(tri_a),
+            Indicate(self.cot_proof[0]),
+            Indicate(self.cot_proof[2]),
+            Indicate(self.cot_proof[3]),
+            run_time=2
+        )
+        self.play(
+            Indicate(tri_b),
+            Indicate(self.cot_proof[6]),
+            Indicate(self.cot_proof[7]),
+            Indicate(self.cot_proof[8]),
+            Indicate(self.cot_proof[9]),
+            run_time=2
+        )
+        self.wait()
+        self.play(
+            tri_a.animate.set_opacity(0),
+            tri_b.animate.set_opacity(0),
+            Unwrite(self.cot_formula),
+            Unwrite(self.cot_proof)
+        )
 
-        
-        
+        for mob in self.mobjects:
+            mob.clear_updaters()
+
+        self.play(
+            Unwrite(self.grid_coords),
+            Unwrite(self.sin_label),
+            Unwrite(self.cos_label),
+            Unwrite(self.tan_label),
+            Unwrite(self.sec_label),
+            Unwrite(self.csc_label),
+            Unwrite(self.cot_label),
+            Unwrite(self.label_f),
+            Uncreate(self.tan_angle),
+            self.cover.animate.move_to([-15, 0, 0])
+        )
+
+        toutlemonde = Group(
+            self.dots,
+            self.big_tri,
+            self.circle,
+            self.angle_a,
+            self.label_a,
+            self.sin_label,
+            self.cos_label,
+            self.tan_label,
+            self.line_c,
+            self.line_a,
+            self.line_b,
+            self.tangent_segment,
+            self.sec_segment,
+            self.csc_segment,
+            self.cot_segment,
+            self.dot_d,
+            self.dot_e,
+            self.dot_o
+        )
+        self.play(
+            Transform(self.grid, self.grid_cir),
+            toutlemonde.animate.scale(0.5, about_point=[0, 0, 0])
+        )
+        self.play(
+            toutlemonde.animate.shift([-4, 0, 0]),
+            self.grid.animate.shift([-4, 0, 0]).set_z_index(0)
+        )
+        self.wait()
 
 
 
