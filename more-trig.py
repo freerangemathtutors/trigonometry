@@ -1,6 +1,6 @@
 # Started getting good enough at manim, swapped to object oriented!
 
-import sys
+# import sys
 from manim import *
 import math
 
@@ -749,6 +749,9 @@ class Graphing(Scene):
         "opp": TEAL_B,
         "adj": GREEN,
         "tan": PURPLE,
+        "cot": PURPLE_A,
+        "sec": MAROON,
+        "csc": MAROON_A,
         "tri_out": WHITE,
         "tri_in": BLUE,
         "tri_in_op": 0.3,
@@ -759,12 +762,26 @@ class Graphing(Scene):
             "Opp.": TEAL_B, 
             "Adj.": GREEN, 
             "Hyp.": GOLD, 
-            "1": GOLD
+            "1": GOLD,
+            r"\sin": TEAL_B,
+            r"\cos": GREEN,
+            r"\tan": PURPLE,
+            r"\sec": MAROON,
+            r"\csc": MAROON_A,
+            r"\cot": PURPLE_A,
+            r"\sin \theta": TEAL_B,
+            r"\cos \theta": GREEN,
+            r"\tan \theta": PURPLE,
+            r"\sec \theta": MAROON,
+            r"\csc \theta": MAROON_A,
+            r"\cot \theta": PURPLE_A
         }
     }
 
     def construct(self):
         self.init_scale = 5
+        self.o = [-4, 0, 0]
+        self.r = 1.5
         setup(self)
         self.theta = ValueTracker(
             math.atan(self.line_c.get_height()/self.line_c.get_width())
@@ -794,6 +811,18 @@ class Graphing(Scene):
             Tex("-1").move_to([-3.3, 0.3, 0]),
             Tex("-1").move_to([0.3, -3.3, 0])
         ).shift([-4, 0, 0]).scale(0.5)
+        self.cast = VGroup(
+            Tex("C", color=self.colours["adj"]).move_to([3, -3, 0]),
+            Tex("A").move_to([3, 3, 0]),
+            Tex("S", color=self.colours["opp"]).move_to([-3, 3, 0]),
+            Tex("T", color=self.colours["tan"]).move_to([-3, -3, 0])
+        ).shift(self.o).scale(0.75)
+        self.frac_cast = VGroup(
+            Tex(r"$\cos \theta$", tex_to_color_map=self.colours["colour_map"]).move_to([3, -3, 0]),
+            Tex("All").move_to([3, 3, 0]),
+            Tex(r"$\sin \theta$", tex_to_color_map=self.colours["colour_map"]).move_to([-3, 3, 0]),
+            Tex(r"$\tan \theta$", tex_to_color_map=self.colours["colour_map"]).move_to([-3, -3, 0])
+        ).shift(self.o+np.array([0.7, 0, 0])).scale(0.75)
         self.circle = Circle(1.5).move_to([-4, 0, 0])
         self.o_arm = Line(ORIGIN, 3*RIGHT)
         self.line_cc = DashedLine(dash_length=0.2)
@@ -955,8 +984,17 @@ class Graphing(Scene):
                 MathTex(r"\cos \theta", color=self.colours["adj"]).move_to(self.axises.get_center()+[0, 3, 0])
             )
         )
+        self.play(self.theta.animate.set_value(0.2*PI))
+        self.onebrace = BraceLabel(
+            self.line_b, 
+            r"\cos \theta", 
+            DOWN
+        ).set_z_index(5)
+        self.play(Write(self.onebrace))
         self.play(Indicate(self.line_b))
         self.wait()
+        self.play(Unwrite(self.onebrace))
+        self.play(self.theta.animate.set_value(0.0001))
         self.end.add_updater(
             lambda mob: mob.move_to(self.axises.coords_to_point(
                 self.theta.get_value(), math.cos(self.theta.get_value())
@@ -1074,18 +1112,77 @@ class Graphing(Scene):
         self.wait()
 
         self.play(
-            Uncreate(self.tangent),
-            Uncreate(self.axises),
             Uncreate(self.connector),
             Uncreate(self.end),
-            Unwrite(self.axis_coords),
             Uncreate(self.deg_display),
             Uncreate(self.func_display),
             Uncreate(self.va)
         )
+
+        self.sine = self.axises.plot(lambda x: math.sin(x), color=self.colours["opp"], x_range=[0, 10])
+        self.cosine = self.axises.plot(lambda x: math.cos(x), color=self.colours["adj"], x_range=[0, 10])
+        self.tangent.clear_updaters()
+        self.play(
+            self.tangent_segment.animate.set_stroke_width(5),
+            FadeIn(self.sine),
+            FadeIn(self.cosine)
+        )
+        with register_font("Teachers-Medium.ttf"):
+            self.notice = Text("CAST rule", font_size=40, font="Teachers")
+            self.notice.move_to([-4, -2.7, 0])
+        self.play(
+            Write(self.notice)
+        )
+        self.play(
+            Write(self.cast),
+            Write(self.frac_cast)
+        )
+        self.wait()
+        self.theta.increment_value(-PI*2)
+        self.play(self.theta.animate.set_value(PI/4))
+        self.progress_bar = Line(
+            self.axises.coords_to_point(self.theta.get_value(), 1.5), 
+            self.axises.coords_to_point(self.theta.get_value(), -1.5),
+            color=YELLOW
+        )
+        self.progress_bar.add_updater(lambda mob: mob.put_start_and_end_on(
+            self.axises.coords_to_point(self.theta.get_value(), 1.5), 
+            self.axises.coords_to_point(self.theta.get_value(), -1.5)
+        ))
+        self.play(FadeIn(self.progress_bar))
+        self.play(
+            Indicate(self.line_a), 
+            Indicate(self.line_b), 
+            Indicate(self.tangent_segment),
+            Indicate(self.cast[1]), Indicate(self.frac_cast[1])
+        )
+        self.wait()
+        self.play(self.theta.animate.set_value(PI*3/4), run_time=1.5)
+        self.play(Indicate(self.line_a), Indicate(self.cast[2]), Indicate(self.frac_cast[2]))
+        self.wait()
+        self.play(self.theta.animate.set_value(PI*5/4), run_time=1.5)
+        self.play(Indicate(self.line_b), Indicate(self.cast[3]), Indicate(self.frac_cast[3]))
+        self.wait()
+        self.play(self.theta.animate.set_value(PI*7/4), run_time=1.5)
+        self.play(Indicate(self.tangent_segment), Indicate(self.cast[0]), Indicate(self.frac_cast[0]))
+        self.wait(3)
+
+        self.play(
+            Uncreate(self.tangent),
+            Uncreate(self.sine),
+            Uncreate(self.cosine),
+            Uncreate(self.axises),
+            Uncreate(self.axis_coords),
+            FadeOut(self.progress_bar)
+        )
         self.play(
             self.theta.animate.set_value(PI*1/5),
-            run_time=3
+            run_time=6
+        )
+        self.play(
+            Unwrite(self.cast),
+            Unwrite(self.frac_cast),
+            Unwrite(self.notice)
         )
         self.line_cc.clear_updaters()
         self.dot_d.clear_updaters()
@@ -1883,7 +1980,7 @@ class ReciprocalGraphs(Scene):
         self.circle = Circle(1.5).shift(self.o)
         self.o_arm = Line(self.o, self.r*RIGHT)
         self.cover = Rectangle(BLACK, 10, 10).set_fill(BLACK, 1).set_opacity(0.5).move_to([-15, 0, 0])
-        self.mask = Rectangle(BLACK, 10, 10).set_fill(BLACK, 1).move_to([5, 0, 0])
+        self.mask = Rectangle(BLACK, 10, 10).set_fill(BLACK, 1).move_to([4.7, 0, 0]).set_z_index(9)
         self.dot_o = Dot(self.o).scale(0.5)
         self.dot_cc = Dot(self.o).scale(0.5)
         self.dot_d = Dot([0, self.r*math.tan(self.theta.get_value()), 0]).scale(0.5)
@@ -2031,15 +2128,16 @@ class ReciprocalGraphs(Scene):
         self.line_c.set_color(GOLD)
         self.line_a.set_color(self.colours["opp"]).set_stroke_width(5),
         self.line_b.set_color(self.colours["adj"]).set_stroke_width(5),
-        self.theta.set_value(0.2*PI)
+        self.theta.set_value(0.3*PI)
 
         self.update_mobjects(0)
         self.wait()
+        self.play(self.theta.animate.set_value(0.2*PI))
         self.play(
             Create(self.axises),
             Create(self.axis_coords),
-            # Create(self.deg_display),
-            Create(self.func_display),
+            Write(self.deg_display),
+            Write(self.func_display),
         )
         self.play(
             Create(self.dot_cc),
@@ -2093,7 +2191,7 @@ class ReciprocalGraphs(Scene):
         self.connector = Line(self.dots[1].get_center(), start)
         self.secant = VGroup(color=self.colours["sec"])
         self.secant.set_points_as_corners(
-            (self.axises.coords_to_point(0, 0), self.axises.coords_to_point(-0.0001, 0))
+            (self.axises.coords_to_point(0, 1), self.axises.coords_to_point(-0.0001, 1))
         )
         def secant_graph(func):
             next_point = self.axises.coords_to_point([
@@ -2283,8 +2381,8 @@ class ReciprocalGraphs(Scene):
         )
 
         self.play(
-            FadeOut(self.secant),
-            FadeOut(self.cosecant),
+            self.secant.animate.set_opacity(0),
+            self.cosecant.animate.set_opacity(0),
             self.theta.animate.set_value(0.0001),
             Transform(
                 self.func_display, 
@@ -2298,15 +2396,18 @@ class ReciprocalGraphs(Scene):
         self.wait()
         self.play(self.theta.animate.set_value(0.2*PI))
         self.wait()
-        self.deg_display.add_updater(
-            lambda mob: mob.become(
+        self.deg_display.become(
                 MathTex(r"\theta =", str(round(math.degrees(self.theta.get_value()))), r"^\circ", color=BLUE)
-            ).move_to([-5.5, 3, 0])
-        )
+        ).move_to([-5.5, 3, 0]).set_opacity(0)
         self.play(
             self.csc_segment.animate.set_stroke_width(5),
             self.cot_segment.animate.set_stroke_width(10),
             self.deg_display.animate.set_opacity(1)
+        )
+        self.deg_display.add_updater(
+            lambda mob: mob.become(
+                MathTex(r"\theta =", str(round(math.degrees(self.theta.get_value()))), r"^\circ", color=BLUE)
+            ).move_to([-5.5, 3, 0])
         )
         self.play(Indicate(self.cot_segment), run_time=2)
         self.wait()
@@ -2350,53 +2451,114 @@ class ReciprocalGraphs(Scene):
         self.wait(3)
 
         self.play(
-            FadeOut(self.cotangent),
-            Uncreate(self.va),
             Uncreate(self.end),
+            Unwrite(self.deg_display),
             Unwrite(self.func_display),
-            Unwrite(self.axis_coords),
-            Uncreate(self.axises),
+            Uncreate(self.va),
         )
+        self.axises.set_z_index(13)
+        self.axis_coords.set_z_index(11)
+        self.secant.set_z_index(12)
+        self.cosecant.set_z_index(12)
+        self.cotangent.set_z_index(12)
+        self.mask.set_z_index(10)
+        self.cover.set_z_index(10)
         self.big_tri.clear_updaters()
         self.play(
             self.sec_segment.animate.set_opacity(1),
             self.tangent_segment.animate.set_opacity(1),
+            self.dot_d.animate.set_opacity(1),
             self.cot_segment.animate.set_stroke_width(5),
             self.big_tri.animate.set_points_as_corners((
                 [-4, 0, 0],
-                [-4, self.r/math.sin(self.theta.get_value()), 0],
                 [self.r/math.cos(self.theta.get_value())-4, 0, 0],
+                [-4, self.r/math.sin(self.theta.get_value()), 0],
                 [-4, 0, 0]
             ))
         )
         self.big_tri.add_updater(lambda mob: mob.set_points_as_corners((
             [0, 0, 0], 
-            [0, self.r/math.sin(self.theta.get_value()), 0],
             [self.r/math.cos(self.theta.get_value()), 0, 0],
+            [0, self.r/math.sin(self.theta.get_value()), 0],
             [0, 0, 0]
         )).shift(self.o))
-        self.theta.set_value(self.theta.get_value()-2*PI)
-        self.play(self.theta.animate.increment_value(PI/2))
+
+        self.theta.increment_value(-2*PI)
+        self.play(self.theta.animate.set_value(PI/4), run_time=2)
         with register_font("Teachers-Medium.ttf"):
-            self.notice = Text("CAST rule applies!", font_size=40, font="Teachers")
-            self.notice.move_to([3, 0, 0])
+            self.notice = Text("CAST rule again!", font_size=40, font="Teachers")
+            self.notice.move_to([-4, -2.9, 0])
+        self.mask.move_to(self.axises.coords_to_point(0, 0)+np.array([5, 0, 0]))
         self.play(
             Write(self.notice),
             Write(self.cast),
+            self.secant.animate.set_opacity(1).set_fill(opacity=0),
+            self.cosecant.animate.set_opacity(1).set_fill(opacity=0)
         )
         self.play(Write(self.frac_cast))
         self.play(Write(self.reci_cast))
+        self.progress_bar = Line(
+            self.axises.coords_to_point(self.theta.get_value(), 1.5), 
+            self.axises.coords_to_point(self.theta.get_value(), -1.5),
+            color=YELLOW
+        )
+        self.progress_bar.add_updater(lambda mob: mob.put_start_and_end_on(
+            self.axises.coords_to_point(self.theta.get_value(), 1.5), 
+            self.axises.coords_to_point(self.theta.get_value(), -1.5)
+        ))
+        self.play(FadeIn(self.progress_bar))
+        self.play(
+            Indicate(self.sec_segment), 
+            Indicate(self.csc_segment), 
+            Indicate(self.cot_segment),
+            Indicate(self.cast[1]), Indicate(self.frac_cast[1])
+        )
+        self.wait()
+        self.play(self.theta.animate.set_value(PI*3/4), run_time=1.5)
+        self.play(Indicate(self.csc_segment), Indicate(self.cast[2]), Indicate(self.frac_cast[2]), Indicate(self.reci_cast[1]))
+        self.wait()
+        self.play(self.theta.animate.set_value(PI*5/4), run_time=1.5)
+        self.play(Indicate(self.cot_segment), Indicate(self.cast[3]), Indicate(self.frac_cast[3]), Indicate(self.reci_cast[2]))
+        self.wait()
+        self.play(self.theta.animate.set_value(PI*7/4), run_time=1.5)
+        self.play(Indicate(self.sec_segment), Indicate(self.cast[0]), Indicate(self.frac_cast[0]), Indicate(self.reci_cast[0]))
+        self.wait(3)
+
+        self.play(
+            Uncreate(self.secant),
+            Uncreate(self.cosecant),
+            Uncreate(self.cotangent),
+            Uncreate(self.axises),
+            Uncreate(self.axis_coords),
+            FadeOut(self.progress_bar)
+        )
+
         self.wait()
         self.play(Unwrite(self.notice))
-        self.play(self.theta.animate.increment_value(2*PI), run_time=5)
-        with register_font("Teachers-Medium.ttf"):
-            self.notice = Text("One last thing... \nco = complementary \ncosine cosecant cotangent", font_size=40, font="Teachers")
-            self.notice.move_to([3, 2, 0])
+        self.play(self.theta.animate.set_value(0.2*PI), run_time=5)
+        self.play(Unwrite(self.frac_cast), Unwrite(self.reci_cast))
         self.complementaries = VGroup(
-            MathTex(r"\cos \theta = \sin(90^{\circ}-\theta)").move_to([-2, 0, 0]),
-            MathTex(r"\csc \theta = \sec(90^{\circ}-\theta)").move_to([0, 0, 0]),
-            MathTex(r"\cot \theta = \tan(90^{\circ}-\theta)").move_to([2, 0, 0]),
-        ).move_to([3, -2, 0])
+            MathTex(r"\cos \theta = \sin(90^{\circ}-\theta)", tex_to_color_map=self.colours["colour_map"]).move_to([0, 1, 0]),
+            MathTex(r"\csc \theta = \sec(90^{\circ}-\theta)", tex_to_color_map=self.colours["colour_map"]).move_to([0, 0, 0]),
+            MathTex(r"\cot \theta = \tan(90^{\circ}-\theta)", tex_to_color_map=self.colours["colour_map"]).move_to([0, -1, 0]),
+        ).move_to([1.8, -1.7, 0]).set_z_index(10)
+        with register_font("Teachers-Medium.ttf"):
+            self.notice = Text(
+                "One last thing... \n\nco = complementary \n\ncosine cosecant cotangent", 
+                font_size=40, font="Teachers", t2c={"co": self.colours["cot"]}
+            ).set_z_index(10)
+            self.notice.move_to([3, 1.5, 0])
+        self.angle_b.clear_updaters()
+        self.angle_b.add_updater(lambda mob: mob.become(
+            Angle(
+                self.line_c, self.csc_segment, 
+                radius=angle_radius(self), 
+                color=self.colours["angle_b"]
+            )
+        ))
+        self.label_b.clear_updaters()
+        self.label_b.become(MathTex(r"90^{\circ}-\theta", color=RED, font_size=25).move_to([-4.6, 0.2, 0]))
+
         self.play(
             Succession(
                 Write(self.notice),
@@ -2404,7 +2566,174 @@ class ReciprocalGraphs(Scene):
                 Write(self.complementaries[1]),
                 Write(self.complementaries[2])
         ))
+        self.wait()
+        self.play(
+            Create(self.angle_b),
+            Write(self.label_b)
+        )
+        self.play(
+            Indicate(self.angle_b),
+            Indicate(self.label_b),
+            FocusOn(self.angle_b)
+        )
+        self.wait()
+        self.play(
+            FadeOut(self.label_b),
+            self.theta.animate.set_value(0.0001),
+            run_time=3
+        )
+        self.angle_b.clear_updaters()
+        self.play(
+            FadeOut(self.angle_b)
+        )
+        self.add(self.mask)
+        self.play(
+            self.theta.animate.set_value(6.7*PI),
+            AnimationGroup(
+                AnimationGroup(
+                    Unwrite(self.notice),
+                    Unwrite(self.complementaries),
+                    lag_ratio=0,
+                ),
+                Wait(16.9),
+                lag_ratio=1,
+            ),
+            run_time=28
+        )
         self.wait(3)
+
+
+class Preamble(Scene):
+    def construct(self):
+        logo_1 = SVGMobject("Logo (1).svg").scale(3)
+        logo_2 = SVGMobject("Logo (2).svg").scale(3)
+        logo_3 = SVGMobject("Logo (3).svg").scale(3)
+        logo_4 = SVGMobject("Logo (4).svg").scale(3)
+        logo_5 = SVGMobject("Logo (5).svg").scale(3)
+        logo = SVGMobject("Logo.svg").scale(3)
+        box_ul = Rectangle(WHITE, 1.08, 1.92).scale(2.7).to_corner(UL, buff=0.3)
+        box_ur = Rectangle(WHITE, 1.08, 1.92).scale(2.7).to_corner(UR, buff=0.3)
+        box_dl = Rectangle(WHITE, 1.08, 1.92).scale(2.7).to_corner(DL, buff=0.3)
+        box_dr = Rectangle(WHITE, 1.08, 1.92).scale(2.7).to_corner(DR, buff=0.3)
+        with register_font("Teachers-Medium.ttf"):
+            title = Text("Trigonometry", font_size=69, font="Teachers")
+            name = Text("The Free-Range Math Tutors", font_size=69, font="Teachers").move_to([0, -2, 0]).set_z_index(1)
+            text_ul = Text("1) Similar triangles", font_size=42, font="Teachers").move_to(box_ul.get_center())
+            text_ur = Text("2) Ratios", font_size=42, font="Teachers").move_to(box_ur.get_center())
+            text_dl = Text("3) Unit circle", font_size=42, font="Teachers").move_to(box_dl.get_center())
+            text_dr = Text("4) Graphs", font_size=42, font="Teachers").move_to(box_dr.get_center())
+
+        self.wait()
+        self.play(Write(title))
+        self.wait()
+        self.play(Succession(
+            Create(box_ul),
+            Create(box_ur),
+            Create(box_dl),
+            Create(box_dr)
+        ))
+        self.wait()
+        self.play(Succession(
+            Write(text_ul),
+            Write(text_ur),
+            Write(text_dl),
+            Write(text_dr)
+        ))
+        self.wait()
+        self.play(
+            Unwrite(title),
+            Unwrite(text_dl),
+            Unwrite(text_dr),
+            Unwrite(text_ul),
+            Unwrite(text_ur),
+            Uncreate(box_ul),
+            Uncreate(box_ur),
+            Uncreate(box_dl),
+            Uncreate(box_dr)
+        )
+        self.wait()
+        self.play(Create(logo_5), Write(name))
+        self.wait(0.2)
+        self.remove(logo_5)
+        self.add(logo_4)
+        self.wait(0.2)
+        self.remove(logo_4)
+        self.add(logo_3)
+        self.wait(0.2)
+        self.remove(logo_3)
+        self.add(logo_2)
+        self.wait(0.2)
+        self.remove(logo_2)
+        self.add(logo_1)
+        self.wait(0.2)
+        self.remove(logo_1)
+        self.add(logo)
+        self.wait(0.2)
+        self.remove(logo)
+        self.add(logo_1)
+        self.wait(0.2)
+        self.remove(logo_1)
+        self.add(logo)
+        self.wait(0.2)
+        self.remove(logo)
+        self.add(logo_1)
+        self.wait(0.2)
+        self.remove(logo_1)
+        self.add(logo)
+        self.wait(2)
+        self.play(Uncreate(logo), Unwrite(name))
+        self.wait()
+
+
+class RenderTest(Scene):
+    colours = {
+        "hyp": GOLD,
+        "opp": TEAL_B,
+        "adj": GREEN,
+        "tan": PURPLE,
+        "cot": PURPLE_A,
+        "sec": MAROON,
+        "csc": MAROON_A,
+        "tri_out": WHITE,
+        "tri_in": BLUE,
+        "tri_in_op": 0.3,
+        "angle_a": BLUE,
+        "angle_b": RED, 
+        "angle_c": WHITE,
+        "colour_map": {
+            "Opp.": TEAL_B, 
+            "Adj.": GREEN, 
+            "Hyp.": GOLD, 
+            "1": GOLD,
+            r"\sin": TEAL_B,
+            r"\cos": GREEN,
+            r"\tan": PURPLE,
+            r"\sec": MAROON,
+            r"\csc": MAROON_A,
+            r"\cot": PURPLE_A,
+            r"\sin \theta": TEAL_B,
+            r"\cos \theta": GREEN,
+            r"\tan \theta": PURPLE,
+            r"\sec \theta": MAROON,
+            r"\csc \theta": MAROON_A,
+            r"\cot \theta": PURPLE_A
+        }
+    }
+    def construct(self):
+        self.complementaries = VGroup(
+            MathTex(r"\cos \theta = \sin(90^{\circ}-\theta)", tex_to_color_map=self.colours["colour_map"]).move_to([0, 1, 0]),
+            MathTex(r"\csc \theta = \sec(90^{\circ}-\theta)", tex_to_color_map=self.colours["colour_map"]).move_to([0, 0, 0]),
+            MathTex(r"\cot \theta = \tan(90^{\circ}-\theta)", tex_to_color_map=self.colours["colour_map"]).move_to([0, -1, 0]),
+        ).move_to([1.8, -1.7, 0])
+        with register_font("Teachers-Medium.ttf"):
+            self.notice = Text(
+                "One last thing... \n\nco = complementary \n\ncosine cosecant cotangent", 
+                font_size=40, font="Teachers", t2c={"co": self.colours["cot"]}
+            )
+            self.notice.move_to([3, 1.5, 0])
+        self.add(self.complementaries, self.notice)
+        self.wait()
+    
 
 # cast, credits scroll, deg display
 
