@@ -2611,48 +2611,21 @@ class Preamble(Scene):
         logo_4 = SVGMobject("Logo (4).svg").scale(3)
         logo_5 = SVGMobject("Logo (5).svg").scale(3)
         logo = SVGMobject("Logo.svg").scale(3)
-        box_ul = Rectangle(WHITE, 1.08, 1.92).scale(2.7).to_corner(UL, buff=0.3)
-        box_ur = Rectangle(WHITE, 1.08, 1.92).scale(2.7).to_corner(UR, buff=0.3)
-        box_dl = Rectangle(WHITE, 1.08, 1.92).scale(2.7).to_corner(DL, buff=0.3)
-        box_dr = Rectangle(WHITE, 1.08, 1.92).scale(2.7).to_corner(DR, buff=0.3)
+        box_ul = Rectangle(WHITE, 1.08, 1.92).set_fill("#00FF00", 1).scale(2.7).to_corner(UL, buff=0.3).shift([0.8, 0, 0])
+        box_ur = Rectangle(WHITE, 1.08, 1.92).set_fill("#00FF02", 1).scale(2.7).to_corner(UR, buff=0.3).shift([-0.8, 0, 0])
+        box_dl = Rectangle(WHITE, 1.08, 1.92).set_fill("#00FF04", 1).scale(2.7).to_corner(DL, buff=0.3).shift([0.8, 0, 0])
+        box_dr = Rectangle(WHITE, 1.08, 1.92).set_fill("#00FF06", 1).scale(2.7).to_corner(DR, buff=0.3).shift([-0.8, 0, 0])
         with register_font("Teachers-Medium.ttf"):
             title = Text("Trigonometry", font_size=69, font="Teachers")
             name = Text("The Free-Range Math Tutors", font_size=69, font="Teachers").move_to([0, -2, 0]).set_z_index(1)
-            text_ul = Text("1) Similar triangles", font_size=42, font="Teachers").move_to(box_ul.get_center())
-            text_ur = Text("2) Ratios", font_size=42, font="Teachers").move_to(box_ur.get_center())
-            text_dl = Text("3) Unit circle", font_size=42, font="Teachers").move_to(box_dl.get_center())
-            text_dr = Text("4) Graphs", font_size=42, font="Teachers").move_to(box_dr.get_center())
+            text_ul = Text("1) Similar triangles", font_size=42, font="Teachers").move_to(box_ul.get_center()).set_z_index(1)
+            text_ur = Text("2) Ratios", font_size=42, font="Teachers").move_to(box_ur.get_center()).set_z_index(1)
+            text_dl = Text("3) Unit circle", font_size=42, font="Teachers").move_to(box_dl.get_center()).set_z_index(1)
+            text_dr = Text("4) Graphs", font_size=42, font="Teachers").move_to(box_dr.get_center()).set_z_index(1)
+            no_ai = Text("Written, animated, and edited by humans, for humans.", font_size=32, font="Teachers").move_to([0, -2.8, 0]).set_z_index(1).scale(0.5)
 
         self.wait()
-        self.play(Write(title))
-        self.wait()
-        self.play(Succession(
-            Create(box_ul),
-            Create(box_ur),
-            Create(box_dl),
-            Create(box_dr)
-        ))
-        self.wait()
-        self.play(Succession(
-            Write(text_ul),
-            Write(text_ur),
-            Write(text_dl),
-            Write(text_dr)
-        ))
-        self.wait()
-        self.play(
-            Unwrite(title),
-            Unwrite(text_dl),
-            Unwrite(text_dr),
-            Unwrite(text_ul),
-            Unwrite(text_ur),
-            Uncreate(box_ul),
-            Uncreate(box_ur),
-            Uncreate(box_dl),
-            Uncreate(box_dr)
-        )
-        self.wait()
-        self.play(Create(logo_5), Write(name))
+        self.play(Write(logo_5), Write(name))
         self.wait(0.2)
         self.remove(logo_5)
         self.add(logo_4)
@@ -2680,8 +2653,38 @@ class Preamble(Scene):
         self.wait(0.2)
         self.remove(logo_1)
         self.add(logo)
-        self.wait(2)
-        self.play(Uncreate(logo), Unwrite(name))
+        self.play(Write(no_ai))
+        self.wait(1.5)
+        self.play(Uncreate(logo), Unwrite(name), Unwrite(no_ai))
+        self.wait()
+
+        self.play(Write(title))
+        self.wait()
+        self.play(Succession(
+            Create(box_ul),
+            Create(box_ur),
+            Create(box_dl),
+            Create(box_dr)
+        ))
+        self.wait()
+        self.play(Succession(
+            Write(text_ul),
+            Write(text_ur),
+            Write(text_dl),
+            Write(text_dr)
+        ))
+        self.wait()
+        self.play(
+            Unwrite(title),
+            Unwrite(text_dl),
+            Unwrite(text_dr),
+            Unwrite(text_ul),
+            Unwrite(text_ur),
+            Uncreate(box_ul),
+            Uncreate(box_ur),
+            Uncreate(box_dl),
+            Uncreate(box_dr)
+        )
         self.wait()
 
 
